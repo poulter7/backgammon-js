@@ -1,4 +1,5 @@
 --require should
---reporter dot
+--reporter spec
 --ui bdd
 --recursive
+--growl
