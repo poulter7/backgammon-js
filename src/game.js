@@ -20,77 +20,55 @@ String.prototype.opponent = function(){
 		return 'red'
 	}
 }
+
+function Player(color, board) {
+	this.color = color;
+	this.board = board;
+}
+Player.prototype = {
+	get state() {
+		if (this.color == 'red'){
+			return this.board.redState
+		} else {
+			return this.board.blackState
+		}
+	},
+	canMovePieceAt: function(pos){
+		return this.board.canMovePieceAt(this.color, pos)
+	},
+	canMoveToTarget: function(target){
+		return this.board.canMoveToTarget(this.color, target)
+	},
+	canBearOff: function(pos, roll){
+		return this.board.canBearOff(this.color, pos, roll)
+	},
+	placePiece: function(target, roll){
+		return this.board.placePiece(this.color, target, roll)
+	},
+	liftPiece: function(target){
+		return this.board.liftPiece(this.color, target)
+	},
+	piecesAt: function(target){
+		return this.board.piecesAt(this.color, target)
+	},
+	validMove: function(pos, roll){
+		return this.board.validMove(this.color, pos, roll)
+	},
+	targetPosition: function (pos, roll){
+		return this.board.targetPosition(this.color, pos, roll)
+	},
+	popBar: function(roll){
+		return this.board.popBar(this.color, roll)
+	}
+
+}
 	
 Board.prototype = {
 	get red(){
-		var me = this
-		return {
-			canMovePieceAt: function(pos){
-				return me.canMovePieceAt('red', pos)
-			},
-			canMoveToTarget: function(target){
-				return me.canMoveToTarget('red', target)
-			},
-			canBearOff: function(pos, roll){
-				return me.canBearOff('red', pos, roll)
-			},
-			placePiece: function(target, roll){
-				return me.placePiece('red', target, roll)
-			},
-			liftPiece: function(target){
-				return me.liftPiece('red', target)
-			},
-			piecesAt: function(target){
-				return me.piecesAt('red', target)
-			},
-			validMove: function(pos, roll){
-				return me.validMove('red', pos, roll)
-			},
-			targetPosition: function (pos, roll){
-				return me.targetPosition('red', pos, roll)
-			},
-			popBar: function(roll){
-				return me.popBar('red', roll)
-			}
-		}
+		return new Player('red', this)
 	},
 	get black(){
-		var me = this
-		return {
-			canMovePieceAt: function(pos){
-				return me.canMovePieceAt('black', pos)
-			},
-			canMoveToTarget: function(target){
-				return me.canMoveToTarget('black', target)
-			},
-			canBearOff: function(pos, roll){
-				return me.canBearOff('black', pos, roll)
-			},
-			placePiece: function(target, roll){
-				return me.placePiece('black', target, roll)
-			},
-			liftPiece: function(target){
-				return me.liftPiece('black', target)
-			},
-			piecesAt: function(target){
-				return me.piecesAt('black', target)
-			},
-			validMove: function(pos, roll){
-				return me.validMove('black', pos, roll)
-			},
-			targetPosition: function (pos, roll){
-				return me.targetPosition('black', pos, roll)
-			},
-			popBar: function (roll){
-				return me.popBar('black', roll)
-			}
-		}
-	},
-	get state(){
-		return {
-			red: this.redState,
-			black: this.blackState
-		}
+		return new Player('black', this)
 	},
 	moveRed: function(pos, roll){
 		this.progressPiece(pos, roll)
@@ -143,8 +121,8 @@ Board.prototype = {
 	},
 	piecesAt: function(player, pos){
 		var r = {
-			red: this.state['red'][pos],
-			black: this.state['black'][pos]
+			red: this['red'].state[pos],
+			black: this['black'].state[pos]
 		}
 		assert( !r.red || !r.black , 'cannot have red and black pieces on the same point\n'.concat(this.toString()))
 		if (typeof r[player] === "undefined"){
@@ -153,7 +131,7 @@ Board.prototype = {
 		return r[player];
 	},
 	liftPiece: function(player, pos){
-		this.state[player][pos] -= 1; 
+		this[player].state[pos] -= 1; 
 	},
 	placePiece: function(player, target, roll){
 		if (this.wouldBearOff(target)){
@@ -161,10 +139,10 @@ Board.prototype = {
 			this.home[player] += 1
 		} else {
 			if (this[player.opponent()].piecesAt(target) == 1){
-				this.state[player.opponent()][target] = 0
+				this[player.opponent()].state[target] = 0
 				this.bar[player.opponent()] += 1
 			}
-			this.state[player][target] = this[player].piecesAt(target) + 1;
+			this[player].state[target] = this[player].piecesAt(target) + 1;
 		}
 	},
 	wouldBearOff: function(target){
@@ -174,9 +152,9 @@ Board.prototype = {
 		var nonHomeIndices = player == 'red'? _.range(1, 19) : _.range(7, 25)
 		var homeIndices = player == 'red'? _.range(19, 25) : _.range(1, 7)
 		
-		var nonHomeValues = _.values(_.pick(this.state[player], nonHomeIndices))
+		var nonHomeValues = _.values(_.pick(this[player].state, nonHomeIndices))
 
-		var homeSubBoard = _.pick(this.state[player], homeIndices)
+		var homeSubBoard = _.pick(this[player].state, homeIndices)
 
 		var homeValues = []
 
