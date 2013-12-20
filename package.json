@@ -1,11 +1,16 @@
 {
-	"devDependencies": {
-		"mocha": "*",
-		"growl": "*",
-		"should": ">= 0.0.1"
-	},
-	"scripts": {
-		"start": "node_modules/.bin/supervisor app",
-		"test": "node_modules/.bin/mocha -w -G"
-	}
+  "dependencies": {
+    "underscore": "~1.5.2",
+    "node-inspector": "~0.6.2"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "growl": "*",
+    "node-inspector": "*",
+    "should": ">= 0.0.1"
+  },
+  "scripts": {
+    "start": "node_modules/.bin/supervisor app",
+    "test": "node_modules/.bin/mocha -w -G"
+  }
 }

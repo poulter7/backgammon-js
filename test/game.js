@@ -48,13 +48,12 @@ describe('Game', function(){
 			var board = new Board()
 			board.blackState = {2:2}
 			board.redState = {1:1}
+			board.red.validMove(1, 1).should.not.be.okay
+			board.red.canMoveToTarget(2).should.not.be.okay
 			board.moveRed(1, 1)
 			board.red.piecesAt(1).should.equal(1)
 			board.red.piecesAt(2).should.equal(0)
 			board.black.piecesAt(2).should.equal(2)
-		}),
-		it('should be able to move off the board', function(){
-			var board = new Board()
 		})
 	})
 	describe('#player', function(){
@@ -113,9 +112,7 @@ describe('Game', function(){
 			var board = new Board()
 			board.blackState = {12:1}
 			board.redState = {11:1}
-			console.log(board)
 			board.moveBlack(12, 1)
-			console.log(board)
 			board.red.piecesAt(11).should.equal(0)
 			board.black.piecesAt(11).should.equal(1)
 			board.bar.red.should.equal(1)
@@ -132,21 +129,21 @@ describe('Game', function(){
 			var board = new Board()
 			board.redState = {1:1}
 			board.bar = {red:1, black:0}
-			board.popRedBar(1)
+			board.red.popBar(1)
 			board.bar.red.should.equal(0)
 			board.red.piecesAt(1).should.equal(2)
 		})
 		it('should be able to move a red piece off of the bar', function(){
 			var board = new Board()
 			board.bar = {red:1, black: 0}
-			board.popRedBar(1)
+			board.red.popBar(1)
 			board.bar.red.should.equal(0)
 			board.red.piecesAt(1).should.equal(1)
 		}),
 		it('should be able to move a red piece off of the bar to a different first six point', function(){
 			var board = new Board()
 			board.bar = {red: 1, black: 0}
-			board.popRedBar(6)
+			board.red.popBar(6)
 			board.bar.red.should.equal(0)
 			board.red.piecesAt(6).should.equal(1)
 		}),
@@ -154,7 +151,7 @@ describe('Game', function(){
 			var board = new Board()
 			board.blackState = {1:1};
 			board.bar = {red:1, black:0}
-			board.popRedBar(1)
+			board.red.popBar(1)
 			board.red.piecesAt(1).should.equal(1, 'Pip successfully entered')
 			board.black.piecesAt(1).should.equal(0, 'Hit pip removed')
 			board.bar.black.should.equal(1, 'Hit pip on bar')
@@ -163,10 +160,81 @@ describe('Game', function(){
 			var board = new Board()
 			board.blackState = {1:2}
 			board.bar = {red:1, black:0}
-			board.popRedBar(1)
+			board.red.popBar(1)
 			board.bar.red.should.equal(1)
 			board.red.piecesAt(1).should.equal(0)
 			board.black.piecesAt(1).should.equal(2)
+		}),
+		it('should be possible to pop a pip from the black bar', function(){
+			var board = new Board()
+			board.redState = {19:1}
+			board.bar = {red:2, black:2}
+			board.black.popBar(6)
+			board.black.piecesAt(19).should.equal(1)
+			board.red.piecesAt(19).should.equal(0)
+			board.bar.red.should.equal(3)
+		})
+	}),
+	describe('#bearingoff', function(){
+		it('should be able to bear off black at the end of a game', function() {
+			var board = new Board()
+			board.blackState = {1:1}
+			board.black.canBearOff(1, 1).should.be.ok
+			board.progressPiece(1, 1)
+			board.black.piecesAt(1).should.equal(0)
+			board.home.black.should.equal(1)
+		}),
+		it('should not be able to bear off black with pieces outside the home zone', function() {
+			var board = new Board()
+			board.blackState = {1:1, 8:2}
+			board.black.canBearOff(1, 1).should.not.be.ok
+		}),
+		it('should not be able to bear off black with a larger move to play', function() {
+			var board = new Board()
+			board.blackState = {1:1, 2:2}
+			board.black.canBearOff(1, 2).should.not.be.ok
+			board.black.canBearOff(2, 2).should.be.ok
+		}),
+		it('should not be able to bear off black with a larger move to play, with a large dice roll', function() {
+			var board = new Board()
+			board.blackState = {1:1, 2:2}
+			board.black.canBearOff(1, 6).should.not.be.ok
+			board.black.canBearOff(2, 6).should.be.ok
+		}),
+		it('should be able to bear off red at the end of a game', function() {
+			var board = new Board()
+			board.redState = {24:1}
+			board.red.canBearOff(24, 1).should.be.ok
+			board.progressPiece(24, 1)
+			board.red.piecesAt(24).should.equal(0)
+			board.home.red.should.equal(1)
+		})
+		it('should not be able to bear off if there are pieces outside of the home board', function(){
+			var board = new Board()
+			board.redState = {1: 1, 24:1}
+			board.red.canBearOff(24, 2).should.not.be.ok
+			board.red.validMove(24, 2).should.not.be.ok
+
+		})
+		it('should not be able to bear off if there are pieces on the bar', function(){
+			var board = new Board()
+			board.redState = {1: 0, 24:1}
+			board.bar.red = 1
+			board.red.canBearOff(24, 1).should.not.be.ok
+			board.progressPiece(24, 1)
+			board.home.red.should.equal(0)
+		})
+		it('should not be able to bear off a piece when another piece should be moved first', function(){
+			var board = new Board()
+			board.redState = {23:1, 24:1}
+			board.red.validMove(24, 2).should.not.be.ok
+			board.red.validMove(23, 2).should.be.ok
+		})
+		it('should not be able to bear off a piece when another piece could be moved without bearing off', function(){
+			var board = new Board()
+			board.redState = {21:0, 22:1, 24:1}
+			board.red.validMove(24, 2).should.not.be.ok
+			board.red.validMove(22, 2).should.be.ok
 		})
 	})
 })
