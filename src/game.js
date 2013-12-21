@@ -1,18 +1,19 @@
 var assert = require('assert')
 var _ = require('underscore')
 
-function Board(bar, blackState, redState) {
+function Board(redState, blackState, bar, home) {
+	this.blackState = typeof blackState !== 'undefined' ? blackState : {};
+	this.redState = typeof redState !== 'undefined' ? redState : {};
 	this.bar = typeof bar !== 'undefined' ? bar : {
 		black: 0,
 		red: 0
 	};
-	this.home = typeof bar !== 'undefined' ? bar : {
+	this.home = typeof home !== 'undefined' ? home : {
 		black: 0,
 		red: 0
 	};
-	this.blackState = typeof blackState !== 'undefined' ? blackState : {};
-	this.redState = typeof redState !== 'undefined' ? redState : {};
 }
+
 String.prototype.opponent = function(){
 	if (this == 'red'){
 		return 'black'
@@ -25,6 +26,7 @@ function Player(color, board) {
 	this.color = color;
 	this.board = board;
 }
+
 Player.prototype = {
 	get state() {
 		if (this.color == 'red'){
@@ -72,7 +74,7 @@ Player.prototype = {
 		furthestPip = f(homeValues);
 
 
-		return _.size(nonHomeValues) == 0 && this.board.bar[this.color] == 0 && furthestPip == pos;
+		return _.size(nonHomeValues) == 0 && this.bar == 0 && furthestPip == pos;
 			
 	},
 	placePiece: function(target, roll){
@@ -165,20 +167,10 @@ Board.prototype = {
 }
 
 var initialBoard = function() {
-	var b = new Board();
-	b.blackState = {
-		24: 2,
-		13: 5,
-		8: 3,
-		6: 5,
-	}
-	b.redState = {
-		1: 2,
-		12: 5,
-		17: 3,
-		19: 5,
-	}
-	return b;
+	return new Board(
+		{1: 2, 12: 5, 17: 3, 19: 5,},
+		{24: 2, 13: 5, 8: 3, 6: 5,}
+	);
 }
 
 module.exports.Board = Board;
