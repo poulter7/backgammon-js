@@ -43,4 +43,7 @@ if ('development' == app.get('env')) {
 	app.use(express.errorHandler());
 }
 
-app.listen(3000);
+port = process.env.PORT || 3000;
+app.listen(port, function() {
+	  console.log("Listening on " + port);
+});
