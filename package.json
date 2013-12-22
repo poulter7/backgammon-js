@@ -1,16 +1,21 @@
 {
   "dependencies": {
     "underscore": "~1.5.2",
-    "node-inspector": "~0.6.2"
+    "node-inspector": "~0.6.2",
+    "express": "*",
+    "mustache": "*",
+    "express3-handlebars": "*",
+    "less-middleware": "*"
   },
   "devDependencies": {
     "mocha": "*",
     "growl": "*",
     "node-inspector": "*",
-    "should": ">= 0.0.1"
+    "should": ">= 0.0.1",
+    "supervisor": "*"
   },
   "scripts": {
-    "start": "node_modules/.bin/supervisor app",
+    "start": "node app.js",
     "test": "node_modules/.bin/mocha -G",
     "watchtest": "node_modules/.bin/mocha -w -G"
   }

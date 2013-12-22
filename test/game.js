@@ -3,7 +3,7 @@ var should = require('should')
 game = require('../src/game.js')
 var Board = game.Board
 var initialBoard = game.initialBoard
-describe('Game', function(){
+describe('Board', function(){
 	describe('#start', function(){
 		it('should have the correct starting positions for red', function(){
 			var board = initialBoard();
