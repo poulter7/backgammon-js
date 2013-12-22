@@ -1,25 +1,37 @@
+body {
+	font-family: 'Alegreya Sans', sans-serif;	
+}
+@board-border: #964B00;
+
+#game-board {
+	padding: 10px;
+	display: inline-block;
+	background-color: @board-border;
+	border-radius: 4px;
+
+}
 @font-face {
 	font-family: "Dice";
 	src: url(http://www.ambor.com/hb/dice.ttf) format("truetype");
-    }
-
-    @beize: darken(green, 10%);
-    .background rect {
-	    fill: @beize;
 }
 
-@col: beige;
+@beize: beige;
+.background rect {
+	fill: @beize;
+}
+
+@col:#5C3F39;
+@col2: darken(@col, 20%);
 
 .places {
 
 	polyline:nth-child(even) {
-			fill: @beize;
+		fill: @col2;
 	}
 
 	polyline:nth-child(odd) {
 		fill: @col;
 	}
-
 	polyline {
 		stroke: @col;
 		stroke-width: 2px;
