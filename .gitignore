@@ -5,3 +5,5 @@ node_modules/
 *.swo
 
 *.log
+
+public/stylesheets/style.css
