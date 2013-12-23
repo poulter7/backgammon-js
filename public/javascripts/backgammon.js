@@ -24,6 +24,8 @@ window.onload = function(){
 		15: 125,
 		14: 75,
 		13: 25,
+		home: 685,
+		bar: 325
 	}
 	var pieces = d3.select("#pieces");
 	radius = 22;
@@ -31,8 +33,13 @@ window.onload = function(){
 	margin = 25
 
 	data = [
-		{position: 1, color: 'Red'},
-		{position: 1, color: 'Red'},
+		{position: 'home', color: 'Red'},
+		{position: 'home', color: 'Red'},
+		{position: 'home', color: 'Black'},
+		{position: 'bar', color: 'Black'},
+		{position: 'bar', color: 'Black'},
+		{position: 'bar', color: 'Red'},
+		{position: 12, color: 'Red'},
 		{position: 12, color: 'Red'},
 		{position: 12, color: 'Red'},
 		{position: 12, color: 'Red'},
@@ -64,9 +71,9 @@ window.onload = function(){
 	];
 
 	// position -> count map
-	perPositionCount = _.countBy(data, function(piece){return piece.position});
+	perPositionCount = _.countBy(data, _.values);
 	// position -> piece map
-	perPositionPiece = _.indexBy(data, function(piece){return piece.position});
+	perPositionPiece = _.indexBy(data, _.values);
 
 	// f(count, piece) -> [pieces with index...]
 	indexedPieceFunction = function (countAndPiece) { 
@@ -86,12 +93,29 @@ window.onload = function(){
 		return px[p.position];
 	}
 	cy = function(p){
-		positionIndent = (2*radius + buffer)*p.index;
-		if (p.position <= 12){ // bottom row
-			return 500 - positionIndent - margin
-		} else { 
-			return positionIndent + margin
+		positionIndent = (2*radius + buffer)*(p.index % 5) + Math.floor(p.index/ 5) * 4 * buffer;
+		if (_.isNumber(p.position)){
+			if (p.position <= 12){ // bottom row
+				return 500 - positionIndent - margin
+			} else { 
+				return positionIndent + margin
+			}
+		} else if (p.position=='home') {
+			if(p.color == 'Red'){
+				return positionIndent + margin
+			} else {
+				return 500 - positionIndent - margin
+			}
+		} else {	// bar
+			var middle = 250
+			if(p.color == 'Black'){
+				return middle - buffer - radius - positionIndent 
+			} else {
+				return middle + buffer + radius + positionIndent
+			}
 		}
+
+		return 0
 	}
 	pieces.enter()
 		.append("circle")
