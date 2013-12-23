@@ -26,24 +26,72 @@ window.onload = function(){
 		13: 25,
 	}
 	var pieces = d3.select("#pieces");
-	console.log(pieces);
 	radius = 22;
 	buffer = 2;
+	margin = 25
 
-	console.log('pieces');
-	pieces = d3.select("#pieces").selectAll("circle").data([
-			{location: 1, color: 'Red'},
-			{location: 2, color: 'Red'},
-			{location: 4, color: 'Black'},
-			{location: 4, color: 'Black'}
-	]);
-	cx = function(p){
-		console.log('cx', p);
-		return px[p.location];
+	data = [
+		{position: 1, color: 'Red'},
+		{position: 1, color: 'Red'},
+		{position: 12, color: 'Red'},
+		{position: 12, color: 'Red'},
+		{position: 12, color: 'Red'},
+		{position: 12, color: 'Red'},
+		{position: 12, color: 'Red'},
+		{position: 17, color: 'Red'},
+		{position: 17, color: 'Red'},
+		{position: 17, color: 'Red'},
+		{position: 19, color: 'Red'},
+		{position: 19, color: 'Red'},
+		{position: 19, color: 'Red'},
+		{position: 19, color: 'Red'},
+		{position: 19, color: 'Red'},
+		{position: 24, color: 'Black'},
+		{position: 24, color: 'Black'},
+		{position: 13, color: 'Black'},
+		{position: 13, color: 'Black'},
+		{position: 13, color: 'Black'},
+		{position: 13, color: 'Black'},
+		{position: 13, color: 'Black'},
+		{position: 8, color: 'Black'},
+		{position: 8, color: 'Black'},
+		{position: 8, color: 'Black'},
+		{position: 6, color: 'Black'},
+		{position: 6, color: 'Black'},
+		{position: 6, color: 'Black'},
+		{position: 6, color: 'Black'},
+		{position: 6, color: 'Black'},
+	];
+
+	// position -> count map
+	perPositionCount = _.countBy(data, function(piece){return piece.position});
+	// position -> piece map
+	perPositionPiece = _.indexBy(data, function(piece){return piece.position});
+
+	// f(count, piece) -> [pieces with index...]
+	indexedPieceFunction = function (countAndPiece) { 
+		return _.times(
+				countAndPiece[0],
+				function(index) {
+					return _.extend({index:index}, countAndPiece[1]);
+				}
+		)
 	}
-	cy = function(p, n){
-		console.log('cy', p);
-		return radius + buffer;
+	indexedPieces = _.map(_.zip(_.values(perPositionCount), _.values(perPositionPiece)), indexedPieceFunction )
+	indexedPieces = _.flatten(indexedPieces)
+	console.log(indexedPieces)
+
+	pieces = d3.select("#pieces").selectAll("circle").data(indexedPieces);
+	cx = function(p){
+		return px[p.position];
+	}
+	cy = function(p){
+		positionIndent = (2*radius + buffer)*p.index;
+		if (p.position <= 12){ // bottom row
+			return 500 - positionIndent - margin
+		} else { 
+			return positionIndent + margin
+		}
 	}
 	pieces.enter()
 		.append("circle")
