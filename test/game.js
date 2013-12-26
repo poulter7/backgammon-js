@@ -236,6 +236,34 @@ describe('Board', function(){
 				board.red.validMove(24, 2).should.not.be.ok;
 				board.red.validMove(22, 2).should.be.ok;
 			})
+		}),
+		describe('#display-state', function(){
+			it('should be able to produce a displayable summary of a board', function(){
+				var board = new Board();
+				board.redState = {2:2, 3:1};
+				board.blackState = {23:1};
+				board.home = {red: 1, black: 3};
+				board.bar = {red: 2, black:4};
+				assert.deepEqual(
+					board.state(),
+					[
+						{position: 'bar', color:'red'},
+						{position: 'bar', color:'red'},
+						{position: 'bar', color:'black'},
+						{position: 'bar', color:'black'},
+						{position: 'bar', color:'black'},
+						{position: 'bar', color:'black'},
+						{position: 'home', color:'red'},
+						{position: 'home', color:'black'},
+						{position: 'home', color:'black'},
+						{position: 'home', color:'black'},
+						{position: 2, color:'red'},
+						{position: 2, color:'red'},
+						{position: 3, color:'red'},
+						{position: 23, color:'black'}
+					]
+				)
+			})
 		})
 })
 

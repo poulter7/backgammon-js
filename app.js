@@ -9,6 +9,8 @@ var routes = require('./routes');
 var http = require('http');
 var path = require('path');
 var lessMiddleware = require('less-middleware');
+var io = require('./src/server.js')
+
 
 
 var app = express();
@@ -44,6 +46,6 @@ if ('development' == app.get('env')) {
 }
 
 port = process.env.PORT || 3000;
-app.listen(port, function() {
-	  console.log("Listening on " + port);
-});
+server = http.createServer(app).listen(port)
+io.start(server)
+

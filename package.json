@@ -6,14 +6,16 @@
     "mustache": "*",
     "express3-handlebars": "*",
     "less-middleware": "*",
-    "d3": "*"
+    "d3": "*",
+    "socket.io": "*"
   },
   "devDependencies": {
     "mocha": "*",
     "growl": "*",
     "node-inspector": "*",
     "should": ">= 0.0.1",
-    "supervisor": "*"
+    "supervisor": "*",
+    "socket.io-client": "*"
   },
   "scripts": {
     "start": "node app.js",

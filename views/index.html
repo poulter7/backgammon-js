@@ -1,10 +1,30 @@
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src='javascripts/underscore.js'></script>
 <script src='javascripts/backgammon.js'></script>
+<script src="/socket.io/socket.io.js"></script>
 	<h1>Backgammon-js</h1>
 <h2>Feel free to stay a while and play a game</h2>
 <div id="game-board">
 
+	<script >
+	var socketURL = 'http://0.0.0.0:3000';
+	var options ={
+		transports: ['websocket'],
+		'force new connection': true
+	};
+	var client = io.connect(socketURL, options);
+	var connected = false
+	client.on("connect", function(data){
+		client.emit("status")
+	});
+
+	client.on("status", function(data){
+		console.log(data)
+		console.log('rendering')
+		render(data)
+
+	});
+	</script>
 	<svg width="710" height="500">
 	<g class="background">
 	<rect width="710" height="700" />

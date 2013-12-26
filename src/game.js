@@ -145,6 +145,34 @@ Board.prototype = {
 	toString: function(){
 		return 'Red: ' + JSON.stringify(this.redState) + '\nBlack: ' + JSON.stringify(this.blackState);
 	},
+	state: function(){
+		var redBar = _(this.bar.red).times(function(){return {position: 'bar', color: 'red'}})
+		var blackBar = _(this.bar.black).times(function(){return {position: 'bar', color: 'black'}})
+		var redHome= _(this.home.red).times(function(){return {position: 'home', color: 'red'}})
+		var blackHome = _(this.home.black).times(function(){return {position: 'home', color: 'black'}})
+
+		var redPieces = _.flatten(
+				_.map(
+					this.redState, 
+					function(p, k){
+						return _(p).times(
+							function(){return {position:parseInt(k), color:'red'}}
+						)
+					}
+				))
+
+		var blackPieces = _.flatten(
+				_.map(
+					this.blackState, 
+					function(p, k){
+						return _(p).times(
+							function(){return {position:parseInt(k), color:'black'}}
+						)
+					}
+				))
+
+		return [].concat(redBar, blackBar, redHome, blackHome, redPieces, blackPieces)
+	},
 	progressPiece: function(pos, roll){
 		var player = undefined;
 		if (this.red.piecesAt(pos) > 0){

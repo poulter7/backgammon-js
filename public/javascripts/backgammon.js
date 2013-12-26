@@ -1,4 +1,10 @@
+
 window.onload = function(){
+	//render()
+}
+
+render = function(data){
+	console.log('Rendering');
 	px = {
 		1: 625,
 		2: 575,
@@ -32,44 +38,6 @@ window.onload = function(){
 	buffer = 2;
 	margin = 25
 
-	data = [
-		{position: 'home', color: 'Red'},
-		{position: 'home', color: 'Red'},
-		{position: 'home', color: 'Black'},
-		{position: 'bar', color: 'Black'},
-		{position: 'bar', color: 'Black'},
-		{position: 'bar', color: 'Red'},
-		{position: 12, color: 'Red'},
-		{position: 12, color: 'Red'},
-		{position: 12, color: 'Red'},
-		{position: 12, color: 'Red'},
-		{position: 12, color: 'Red'},
-		{position: 12, color: 'Red'},
-		{position: 17, color: 'Red'},
-		{position: 17, color: 'Red'},
-		{position: 17, color: 'Red'},
-		{position: 19, color: 'Red'},
-		{position: 19, color: 'Red'},
-		{position: 19, color: 'Red'},
-		{position: 19, color: 'Red'},
-		{position: 19, color: 'Red'},
-		{position: 24, color: 'Black'},
-		{position: 24, color: 'Black'},
-		{position: 13, color: 'Black'},
-		{position: 13, color: 'Black'},
-		{position: 13, color: 'Black'},
-		{position: 13, color: 'Black'},
-		{position: 13, color: 'Black'},
-		{position: 8, color: 'Black'},
-		{position: 8, color: 'Black'},
-		{position: 8, color: 'Black'},
-		{position: 6, color: 'Black'},
-		{position: 6, color: 'Black'},
-		{position: 6, color: 'Black'},
-		{position: 6, color: 'Black'},
-		{position: 6, color: 'Black'},
-	];
-
 	// position -> count map
 	perPositionCount = _.countBy(data, _.values);
 	// position -> piece map
@@ -87,6 +55,7 @@ window.onload = function(){
 	indexedPieces = _.map(_.zip(_.values(perPositionCount), _.values(perPositionPiece)), indexedPieceFunction )
 	indexedPieces = _.flatten(indexedPieces)
 	console.log(indexedPieces)
+	console.log('a')
 
 	pieces = d3.select("#pieces").selectAll("circle").data(indexedPieces);
 	cx = function(p){
@@ -101,7 +70,7 @@ window.onload = function(){
 				return positionIndent + margin
 			}
 		} else if (p.position=='home') {
-			if(p.color == 'Red'){
+			if(p.color == 'red'){
 				return positionIndent + margin
 			} else {
 				return 500 - positionIndent - margin
@@ -120,7 +89,7 @@ window.onload = function(){
 	pieces.enter()
 		.append("circle")
 		.attr("r", radius)
-		.classed("red", function(d){ return d.color == "Red"})
+		.classed("red", function(d){ return d.color == "red"})
 
 	pieces
 		.attr("cx", cx)
