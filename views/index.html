@@ -14,17 +14,13 @@
 	};
 	var client = io.connect(socketURL, options);
 	client.on("connect", function(data){
-		client.emit("dice");
-		console.log('Emit dice')
 		client.emit("status");
-		console.log('Emit status')
+		client.emit("dice");
 	});
 	client.on("status", function(board){
-		console.log('Status rendering')
 		render_board(board)
 	});
 	client.on("dice", function(dice){
-		console.log('Status dice')
 		render_dice(dice)
 	});
 	</script>
