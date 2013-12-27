@@ -32,19 +32,57 @@ px = {
 	bar: 325
 }
 
+cx = function(p){
+	return px[p.position];
+}
+cy = function(p){
+	positionIndent = (2*radius + buffer)*(p.index % 5) + Math.floor(p.index/ 5) * 4 * buffer;
+	if (_.isNumber(p.position)){
+		if (p.position <= 12){ // bottom row
+			return 500 - positionIndent - margin
+		} else { 
+			return positionIndent + margin
+		}
+	} else if (p.position=='home') {
+		if(p.color == 'red'){
+			return positionIndent + margin
+		} else {
+			return 500 - positionIndent - margin
+		}
+	} else {	// bar
+		var middle = 250
+		if(p.color == 'Black'){
+			return middle - buffer - radius - positionIndent 
+		} else {
+			return middle + buffer + radius + positionIndent
+		}
+	}
+	return 0
+}
+
 selected = undefined;
+
+var drag = d3.behavior.drag();
+
+drag.on("drag", function() {
+	d3.select(this).attr("cx", +d3.select(this).attr("cx") + d3.event.dx);
+	d3.select(this).attr("cy", +d3.select(this).attr("cy") + d3.event.dy);
+})
 
 deselect = function() {
 	d3.select(".selected").classed("selected", false);
 	selected = undefined;
 }
 
-select = function(circle){
-	console.log(circle)
-	deselect()
+selectPiece = function(circle){
 	sel = d3.select(circle)
 	selected = sel.datum()
-	sel.classed("selected", true)
+
+	if (selected.selectable){
+		deselect()
+		console.log(circle)
+		sel.classed("selected", true)
+	}
 }
 
 render_dice = function(dice){
@@ -75,52 +113,23 @@ render_board = function(data){
 		return _.times(
 				countAndPiece[0],
 				function(index) {
-					return _.extend({index:index}, countAndPiece[1]);
+					console.log(index, countAndPiece[0])
+					return _.extend({index:index, selectable: index === countAndPiece[0] -1}, countAndPiece[1]);
 				}
 		)
 	}
 	indexedPieces = _.map(_.zip(_.values(perPositionCount), _.values(perPositionPiece)), indexedPieceFunction )
 	indexedPieces = _.flatten(indexedPieces)
-	console.log(indexedPieces)
 
 	pieces = d3.select("#pieces").selectAll("circle").data(indexedPieces);
-	cx = function(p){
-		return px[p.position];
-	}
-	cy = function(p){
-		positionIndent = (2*radius + buffer)*(p.index % 5) + Math.floor(p.index/ 5) * 4 * buffer;
-		if (_.isNumber(p.position)){
-			if (p.position <= 12){ // bottom row
-				return 500 - positionIndent - margin
-			} else { 
-				return positionIndent + margin
-			}
-		} else if (p.position=='home') {
-			if(p.color == 'red'){
-				return positionIndent + margin
-			} else {
-				return 500 - positionIndent - margin
-			}
-		} else {	// bar
-			var middle = 250
-			if(p.color == 'Black'){
-				return middle - buffer - radius - positionIndent 
-			} else {
-				return middle + buffer + radius + positionIndent
-			}
-		}
-
-		return 0
-	}
 	pieces.enter()
 		.append("circle")
 		.attr("r", radius)
 		.classed("red", function(d){ return d.color == "red"})
-		.on('click', function(){select(this)})
+		.on('click', function(){selectPiece(this)})
 
 	pieces
 		.attr("cx", cx)
 		.attr("cy", cy)
-
 
 }
