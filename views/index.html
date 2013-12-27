@@ -7,7 +7,7 @@
 <div id="game-board">
 
 	<script >
-	var socketURL = 'http://0.0.0.0:3000';
+	var socketURL = 'http://' + window.location.host;
 	var options ={
 		transports: ['websocket'],
 		'force new connection': true
