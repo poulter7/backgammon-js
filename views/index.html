@@ -13,16 +13,19 @@
 		'force new connection': true
 	};
 	var client = io.connect(socketURL, options);
-	var connected = false
 	client.on("connect", function(data){
-		client.emit("status")
+		client.emit("dice");
+		console.log('Emit dice')
+		client.emit("status");
+		console.log('Emit status')
 	});
-
-	client.on("status", function(data){
-		console.log(data)
-		console.log('rendering')
-		render(data)
-
+	client.on("status", function(board){
+		console.log('Status rendering')
+		render_board(board)
+	});
+	client.on("dice", function(dice){
+		console.log('Status dice')
+		render_dice(dice)
 	});
 	</script>
 	<svg width="710" height="500">
@@ -70,5 +73,4 @@
 	</svg>
 </div>
 <div id="dice">
-	    
 </div>

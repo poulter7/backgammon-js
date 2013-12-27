@@ -3,7 +3,19 @@ window.onload = function(){
 	//render()
 }
 
-render = function(data){
+render_dice = function(dice){
+	console.log(dice)
+	pieces = d3.select("#dice")
+		.selectAll("span")
+		.data(dice)
+		.enter()
+		.append("span")
+		.text(function(n){return n})
+	console.log('render_dice')
+
+}
+
+render_board = function(data){
 	console.log('Rendering');
 	px = {
 		1: 625,
@@ -55,7 +67,6 @@ render = function(data){
 	indexedPieces = _.map(_.zip(_.values(perPositionCount), _.values(perPositionPiece)), indexedPieceFunction )
 	indexedPieces = _.flatten(indexedPieces)
 	console.log(indexedPieces)
-	console.log('a')
 
 	pieces = d3.select("#pieces").selectAll("circle").data(indexedPieces);
 	cx = function(p){

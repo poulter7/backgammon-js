@@ -45,6 +45,21 @@ describe('Game', function(){
 				done();
 			});
 		}),
+		it('should be possible to retrieve the current dice roll', function(done){
+			var client = io.connect(socketURL, options);
+			game = require('../src/game.js');
+
+			client.on("connect", function(data){
+				client.emit("dice");
+				client.on("dice", function(dice){
+					assert.deepEqual(
+						dice,
+						[6,6,6,6]
+					)
+					done();
+				});
+			});
+		}),
 		it('should be Red to play first', function(done){
 			var client = io.connect(socketURL, options);
 			client.on("connect", function(data){
