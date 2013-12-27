@@ -3,9 +3,12 @@ var ioModule = require('socket.io')
 
 currentGame = undefined
 
-start = function(port, cb){
-	io = ioModule.listen(port, cb);
+start = function(app, port, cb){
 	currentGame = game.initialBoard()
+
+	port = process.env.PORT || port || 5000;
+	var server = app.listen(port, cb)
+	io = require('socket.io').listen(server);
 
 	return io.sockets.on('connection', function (socket) {
 		socket.on("status", function() {

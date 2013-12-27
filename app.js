@@ -45,7 +45,6 @@ if ('development' == app.get('env')) {
 	app.use(express.errorHandler());
 }
 
-port = process.env.PORT || 3000;
-server = http.createServer(app).listen(port)
-io.start(server)
+io.start(app, 3000)
+
 

@@ -14,7 +14,11 @@ var options ={
 describe('Game', function(){
 	describe('#view', function(){
 		before(function(done){
-			server.start(done);
+			//server.start(done);
+			var express = require('express');
+			var app = express();
+			server.start(app, 5000, done)
+
 		})
 		after(function(done){
 			server.stop(done);
@@ -34,7 +38,6 @@ describe('Game', function(){
 			game = require('../src/game.js')
 
 			client.on("status", function(data){
-				console.log(data)
 				assert.deepEqual(
 					data,
 					game.initialBoard().state()
