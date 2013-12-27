@@ -19,6 +19,8 @@ start = function(app, port, cb){
 			return socket.emit("player", currentPlayer)
 		});
 		socket.on("move", function(pos, roll) {
+			console.log(pos, roll)
+			currentGame.progressPiece(pos, roll)
 			currentPlayer = currentPlayer.opponent();
 			return socket.emit("status", currentGame.state())
 		});
