@@ -1,3 +1,10 @@
 language: node_js
-node_js:
-    - "0.10"
+node_js: 
+    - '0.10'
+deploy:
+  provider: heroku
+  api_key:
+    secure: E3Ley4R5203xhlQpIC623lt6xwFFzlkoDpd7g+P8yrqdwjEoFIs6fAS8wtfV24L9M018HgNG+Tlm8HiM4quwc4UG3ekHTww29gf+KFgi/TToO5acag7a8zyZ0KWIMRgz3jtvsjNU5FSk/FLNSKY4orreAIjExnmlzwXnb+IgDNY=
+  app: backgammon-js
+  on:
+    repo: poulter7/backgammon-js
