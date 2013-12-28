@@ -2,7 +2,11 @@ var ioModule = require('socket.io')
  , game = require('./game.js')
 
 currentGame = undefined
+currentPlayer = undefined
 
+rollDice = function(){
+
+}
 start = function(app, port, cb){
 	currentGame = game.initialBoard();
 	currentPlayer = 'red';
@@ -20,9 +24,11 @@ start = function(app, port, cb){
 			return socket.emit("player", currentPlayer)
 		});
 		socket.on("move", function(pos, roll) {
+			console.log('move', pos, roll)
 			currentGame.progressPiece(pos, roll)
 			currentPlayer = currentPlayer.opponent();
-			return socket.emit("status", currentGame.state())
+			socket.emit("status", currentGame.state())
+			return socket.emit("dice", currentDice)
 		});
 		socket.on("dice", function(){
 			return socket.emit("dice", currentDice);

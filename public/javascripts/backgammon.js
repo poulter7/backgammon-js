@@ -1,3 +1,6 @@
+radius = 22;
+buffer = 2;
+margin = 25
 
 window.onload = function(){
 	//render()
@@ -74,62 +77,69 @@ deselect = function() {
 	selected = undefined;
 }
 
-selectPiece = function(circle){
-	sel = d3.select(circle)
-	selected = sel.datum()
+selectDice = function(die){
+	client.emit('move', selected.position, parseInt(die.text))
+}
 
-	if (selected.selectable){
-		deselect()
-		console.log(circle)
-		sel.classed("selected", true)
+selectPiece = function(circle){
+	var sel = d3.select(circle);
+	var clicked = sel.datum();
+
+	if (clicked.selectable){
+		deselect();
+		sel.classed("selected", true);
+
+		selected = clicked;
 	}
 }
 
 render_dice = function(dice){
 	console.log('Dice', dice)
 	pieces = d3.select("#dice")
-		.selectAll("span")
+		.selectAll("a")
 		.data(dice)
 		.enter()
-		.append("span")
-		.on('click', function(d){select(this)})
+		.append("a")
+		.on('click', function(d){selectDice(this)})
 		.text(_.identity)
 }
 
 render_board = function(data){
+	deselect()
 	console.log('Rendering');
-	var pieces = d3.select("#pieces");
-	radius = 22;
-	buffer = 2;
-	margin = 25
 
 	// position -> count map
-	perPositionCount = _.countBy(data, _.values);
+	var perPositionCount = _.countBy(data, _.values);
 	// position -> piece map
-	perPositionPiece = _.indexBy(data, _.values);
+	var perPositionPiece = _.indexBy(data, _.values);
 
 	// f(count, piece) -> [pieces with index...]
-	indexedPieceFunction = function (countAndPiece) { 
+	var indexedPieceFunction = function (countAndPiece) { 
 		return _.times(
 				countAndPiece[0],
 				function(index) {
-					console.log(index, countAndPiece[0])
 					return _.extend({index:index, selectable: index === countAndPiece[0] -1}, countAndPiece[1]);
 				}
 		)
 	}
-	indexedPieces = _.map(_.zip(_.values(perPositionCount), _.values(perPositionPiece)), indexedPieceFunction )
-	indexedPieces = _.flatten(indexedPieces)
+	var indexedPieces = _.map(_.zip(_.values(perPositionCount), _.values(perPositionPiece)), indexedPieceFunction )
+	var indexedPieces = _.flatten(indexedPieces)
 
-	pieces = d3.select("#pieces").selectAll("circle").data(indexedPieces);
-	pieces.enter()
+	console.log(indexedPieces)
+	d3.select("#pieces")
+		.selectAll("circle")
+		.data(indexedPieces)
+		.enter()
 		.append("circle")
+		
+	d3.select("#pieces")
+		.selectAll("circle")
+		.data(indexedPieces)
 		.attr("r", radius)
+		.attr("cx", cx)
+		.attr("cy", cy)
 		.classed("red", function(d){ return d.color == "red"})
 		.on('click', function(){selectPiece(this)})
 
-	pieces
-		.attr("cx", cx)
-		.attr("cy", cy)
 
 }

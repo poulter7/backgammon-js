@@ -15,7 +15,8 @@
     "node-inspector": "*",
     "should": ">= 0.0.1",
     "supervisor": "*",
-    "socket.io-client": "*"
+    "socket.io-client": "*",
+    "zombie": "*"
   },
   "scripts": {
     "start": "node app.js",
