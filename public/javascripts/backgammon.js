@@ -1,9 +1,25 @@
 radius = 22;
 buffer = 2;
 margin = 25
+var socketURL = 'http://' + window.location.host;
+var options ={
+	transports: ['websocket'],
+	'force new connection': true
+};
+
 
 window.onload = function(){
-	//render()
+	client = io.connect(socketURL, options);
+	client.on("connect", function(data){
+		client.emit("status");
+		client.emit("dice");
+	});
+	client.on("status", function(board){
+		render_board(board)
+	});
+	client.on("dice", function(dice){
+		render_dice(dice)
+	});
 }
 
 px = {
@@ -94,7 +110,6 @@ selectPiece = function(circle){
 }
 
 render_dice = function(dice){
-	console.log('Dice', dice)
 	pieces = d3.select("#dice")
 		.selectAll("a")
 		.data(dice)
@@ -106,7 +121,6 @@ render_dice = function(dice){
 
 render_board = function(data){
 	deselect()
-	console.log('Rendering');
 
 	// position -> count map
 	var perPositionCount = _.countBy(data, _.values);
@@ -125,7 +139,6 @@ render_board = function(data){
 	var indexedPieces = _.map(_.zip(_.values(perPositionCount), _.values(perPositionPiece)), indexedPieceFunction )
 	var indexedPieces = _.flatten(indexedPieces)
 
-	console.log(indexedPieces)
 	d3.select("#pieces")
 		.selectAll("circle")
 		.data(indexedPieces)

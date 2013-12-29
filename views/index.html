@@ -6,25 +6,6 @@
 <h2>Feel free to stay a while and play a game</h2>
 <div id="game-board">
 
-	<script >
-	var socketURL = 'http://' + window.location.host;
-	var options ={
-		transports: ['websocket'],
-		'force new connection': true
-	};
-
-	client = io.connect(socketURL, options);
-	client.on("connect", function(data){
-		client.emit("status");
-		client.emit("dice");
-	});
-	client.on("status", function(board){
-		render_board(board)
-	});
-	client.on("dice", function(dice){
-		render_dice(dice)
-	});
-	</script>
 	<svg width="710" height="500">
 	<g class="background">
 	<rect width="710" height="700" />

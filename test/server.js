@@ -1,27 +1,38 @@
 var assert = require('assert')
 var should = require('should')
 var _ = require('underscore')
-server = require('../src/server.js')
+var app_module = require('../src/server.js')
 
 var should = require('should');
 var io = require('socket.io-client');
 
 var socketURL = 'http://0.0.0.0:5000';
+var Browser = require("zombie");
 var options ={
 	transports: ['websocket'],
 	'force new connection': true
 };
 
+var browser = undefined
 describe('Game', function(){
 	describe('#view', function(){
 		before(function(done){
-			var express = require('express');
-			var app = express();
-			server.start(app, 5000, done)
-		})
+			app_module.start(5000);
+			browser = new Browser()
+			done();
+		}),
 		after(function(done){
-			server.stop(done);
-		})
+			app_module.stop(done);
+		}),
+		it('should load correctly', function(done){
+			this.timeout(5000);
+			browser
+				.visit("http://0.0.0.0:5000")
+				.then(function(){
+					browser.success.should.be.ok;
+				})
+				.then(done)
+		}),
 		it('should be possible to connect to a server', function(done){
 			var client = io.connect(socketURL, options);
 			client.on("connect", function(data){
@@ -85,7 +96,6 @@ describe('Game', function(){
 					});
 				});
 			});
-				
 		})
 	})
 })
