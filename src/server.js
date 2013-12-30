@@ -21,7 +21,6 @@ var ioModule = require('socket.io')
  , http = require('http')
  , path = require('path')
 
-console.log(__dirname)
 loadApp = function(){
 	var app = express();
 	// all environments
@@ -63,8 +62,6 @@ launchApp = function(app, port){
 loadIO = function(server){
 	var io = require('socket.io').listen(server);
 
-	console.log('Launching ', server.address())
-
 	io.sockets.on('connection', function (socket) {
 		socket.on("status", function() {
 			return socket.emit("status", currentGame.state())
@@ -73,7 +70,6 @@ loadIO = function(server){
 			return socket.emit("player", currentPlayer)
 		});
 		socket.on("move", function(pos, roll) {
-			console.log('move', pos, roll)
 			currentGame.progressPiece(pos, roll)
 			currentPlayer = currentPlayer.opponent();
 			socket.emit("status", currentGame.state())
@@ -88,12 +84,12 @@ loadIO = function(server){
 
 start = function(port, cb){
 	server = launchApp(loadApp(), port);
-	loadIO(server);
+	io = loadIO(server);
 	newGame();
 }
 
 stop = function(cb){
-	server.close();
+	io.server.close();
 	cb()
 }
 module.exports.start = start;

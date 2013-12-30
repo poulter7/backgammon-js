@@ -7,7 +7,6 @@ var options ={
 	'force new connection': true
 };
 
-
 window.onload = function(){
 	client = io.connect(socketURL, options);
 	client.on("connect", function(data){

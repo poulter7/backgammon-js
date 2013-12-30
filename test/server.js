@@ -13,6 +13,20 @@ var options ={
 	'force new connection': true
 };
 
+waitFor = function(browser, precondition, callback){
+	var condition = precondition(browser);
+	if (precondition(browser)){
+		callback(browser)
+		return;
+	}
+	setTimeout(
+		function() {
+			waitFor(browser, precondition, callback)
+		}, 
+		100
+	);
+}
+
 var browser = undefined
 describe('Game', function(){
 	describe('#view', function(){
@@ -24,7 +38,7 @@ describe('Game', function(){
 		after(function(done){
 			app_module.stop(done);
 		}),
-		it('should load correctly', function(done){
+		it('should be able to get to main page', function(done){
 			this.timeout(5000);
 			browser
 				.visit("http://0.0.0.0:5000")
@@ -32,6 +46,24 @@ describe('Game', function(){
 					browser.success.should.be.ok;
 				})
 				.then(done)
+		}),
+		it('should be able to see main board', function(done){
+			this.timeout(5000)
+			finishedLoading = function(b){
+				return  b.success && b.queryAll("circle").length > 0;
+			};
+			postLoading = function(b){
+				b.queryAll("circle").length.should.be.equal(30);
+				done();
+			};
+
+			browser.visit("http://0.0.0.0:5000");
+
+			waitFor(
+				browser,
+				finishedLoading,
+				postLoading
+			);
 		}),
 		it('should be possible to connect to a server', function(done){
 			var client = io.connect(socketURL, options);
