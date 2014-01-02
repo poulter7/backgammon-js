@@ -89,7 +89,7 @@ start = function(port, cb){
 }
 
 stop = function(cb){
-	io.server.close();
+	server.close();
 	cb()
 }
 module.exports.start = start;

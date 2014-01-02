@@ -150,6 +150,8 @@ render_board = function(data){
 		.attr("r", radius)
 		.attr("cx", cx)
 		.attr("cy", cy)
+		.attr("index", function(d){ return d.index})
+		.attr("pos", function(d){ return d.position})
 		.classed("red", function(d){ return d.color == "red"})
 		.on('click', function(){selectPiece(this)})
 

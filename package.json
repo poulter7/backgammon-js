@@ -10,13 +10,15 @@
     "socket.io": "*"
   },
   "devDependencies": {
+    "jquery": "*",
     "mocha": "*",
     "growl": "*",
     "node-inspector": "*",
     "should": ">= 0.0.1",
     "supervisor": "*",
     "socket.io-client": "*",
-    "zombie": "*"
+    "phantom": "*",
+    "grunt": "*"
   },
   "scripts": {
     "start": "node app.js",
