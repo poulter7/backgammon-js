@@ -69,10 +69,10 @@ cy = function(p){
 		}
 	} else {	// bar
 		var middle = 250
-		if(p.color == 'Black'){
-			return middle - buffer - radius - positionIndent 
-		} else {
+		if(p.color == 'red'){
 			return middle + buffer + radius + positionIndent
+		} else {
+			return middle - buffer - radius - positionIndent 
 		}
 	}
 	return 0

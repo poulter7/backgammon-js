@@ -99,10 +99,14 @@ Player.prototype = {
 		}
 		assert( !this.board.red.state[pos]|| !this.board.black.state[pos], 'cannot have red and black pieces on the same point\n'.concat(this.toString()))
 
-		if (typeof this.state[pos] === "undefined"){
-			this.state[pos] = 0;
-		} 
-		return this.state[pos];
+		if (pos === 'bar'){
+			return this.bar
+		} else {
+			if (typeof this.state[pos] === "undefined"){
+				this.state[pos] = 0;
+			} 
+			return this.state[pos];
+		}
 	},
 	validMove: function(pos, roll){
 		var target = this.targetPosition(pos, roll);
@@ -181,10 +185,14 @@ Board.prototype = {
 			owner = this.black;
 		}
 		if (owner){
-			var target = owner.targetPosition(pos, roll);
-			if (owner.validMove(pos, roll)){
-				owner.liftPiece(pos);
-				owner.placePiece(target, roll);
+			if (pos === 'bar'){
+				owner.popBar(roll)
+			} else {
+				var target = owner.targetPosition(pos, roll);
+				if (owner.validMove(pos, roll)){
+					owner.liftPiece(pos);
+					owner.placePiece(target, roll);
+				}
 			}
 		}
 

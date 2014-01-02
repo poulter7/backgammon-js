@@ -140,40 +140,47 @@ describe('Board', function(){
 				board.bar.red.should.equal(0);
 				board.red.piecesAt(1).should.equal(1);
 			}),
-				it('should be able to move a red piece off of the bar to a different first six point', function(){
-					var board = new Board();
-					board.bar = {red: 1, black: 0};
-					board.red.popBar(6);
-					board.bar.red.should.equal(0);
-					board.red.piecesAt(6).should.equal(1);
-				}),
-				it('should be possible to hit a blot from entering', function(){
-					var board = new Board();
-					board.blackState = {1:1};;
-					board.bar = {red:1, black:0};
-					board.red.popBar(1);
-					board.red.piecesAt(1).should.equal(1, 'Pip successfully entered');
-					board.black.piecesAt(1).should.equal(0, 'Hit pip removed');
-					board.bar.black.should.equal(1, 'Hit pip on bar');
-				}),
-				it('should not be able to pop a piece when a black stack is blocking', function(){
-					var board = new Board();
-					board.blackState = {1:2};
-					board.bar = {red:1, black:0};
-					board.red.popBar(1);
-					board.bar.red.should.equal(1);
-					board.red.piecesAt(1).should.equal(0);
-					board.black.piecesAt(1).should.equal(2);
-				}),
-				it('should be possible to pop a pip from the black bar', function(){
-					var board = new Board();
-					board.redState = {19:1};
-					board.bar = {red:2, black:2};
-					board.black.popBar(6);
-					board.black.piecesAt(19).should.equal(1);
-					board.red.piecesAt(19).should.equal(0);
-					board.bar.red.should.equal(3);
-				})
+			it('should be able to move a red piece off of the bar using lift', function(){
+				var board = new Board();
+				board.bar = {red:1, black: 0};
+				board.moveRed('bar', 1);
+				board.bar.red.should.equal(0);
+				board.red.piecesAt(1).should.equal(1);
+			}),
+			it('should be able to move a red piece off of the bar to a different first six point', function(){
+				var board = new Board();
+				board.bar = {red: 1, black: 0};
+				board.red.popBar(6);
+				board.bar.red.should.equal(0);
+				board.red.piecesAt(6).should.equal(1);
+			}),
+			it('should be possible to hit a blot from entering', function(){
+				var board = new Board();
+				board.blackState = {1:1};;
+				board.bar = {red:1, black:0};
+				board.red.popBar(1);
+				board.red.piecesAt(1).should.equal(1, 'Pip successfully entered');
+				board.black.piecesAt(1).should.equal(0, 'Hit pip removed');
+				board.bar.black.should.equal(1, 'Hit pip on bar');
+			}),
+			it('should not be able to pop a piece when a black stack is blocking', function(){
+				var board = new Board();
+				board.blackState = {1:2};
+				board.bar = {red:1, black:0};
+				board.red.popBar(1);
+				board.bar.red.should.equal(1);
+				board.red.piecesAt(1).should.equal(0);
+				board.black.piecesAt(1).should.equal(2);
+			}),
+			it('should be possible to pop a pip from the black bar', function(){
+				var board = new Board();
+				board.redState = {19:1};
+				board.bar = {red:2, black:2};
+				board.black.popBar(6);
+				board.black.piecesAt(19).should.equal(1);
+				board.red.piecesAt(19).should.equal(0);
+				board.bar.red.should.equal(3);
+			})
 		}),
 		describe('#bearingoff', function(){
 			it('should be able to bear off black at the end of a game', function() {
