@@ -17,7 +17,7 @@
     "should": ">= 0.0.1",
     "supervisor": "*",
     "socket.io-client": "*",
-    "phantom": "*",
+    "zombie": "*",
     "grunt": "*"
   },
   "scripts": {
