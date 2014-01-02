@@ -4,7 +4,7 @@ var assert = require('assert')
 , app_module = require('../src/server.js')
 , jQuery = require('jquery')
 , should = require('should')
-, io = require('socket.io-client')
+, ioClient= require('socket.io-client')
 , Browser = require("zombie");
 
 var browser = undefined
@@ -81,15 +81,18 @@ describe('Game', function(){
 			app_module.start(5000);
 			done();
 		}),
+		beforeEach(function(){
+			app_module.resetServer();
+		}),
 		after(function(done){
 			app_module.stop(done);
 		}),
 		it('should be possible to connect to a server', function(done){
-			var client = io.connect(socketURL, options);
+			var client = ioClient.connect(socketURL, options);
 			client.on("connect", done);
 		})
 		it('should be possible to retreive an initial game state', function(done){
-			var client = io.connect(socketURL, options);
+			var client = ioClient.connect(socketURL, options);
 			game = require('../src/game.js');
 
 			client.on("connect", function(data){
@@ -106,23 +109,41 @@ describe('Game', function(){
 			});
 		}),
 		it('should be possible to retrieve the current dice roll', function(done){
-			var client = io.connect(socketURL, options);
-			game = require('../src/game.js');
-
-			doneOnce = _.once(done)
+			var client = ioClient.connect(socketURL, options);
 			client.on("connect", function(data){
 				client.emit("dice");
 				client.on("dice", function(dice){
 					assert.deepEqual(
 						dice,
 						[6,6,6,6]
-					)
-					doneOnce();
+					);
+					done();
 				});
 			});
 		}),
+		it('should be the case that all players are notified about a status change', function(done){
+			this.timeout(10000);
+			var client1 = ioClient.connect(socketURL, options);
+
+			client1.on("connect", function(data){
+				var client2 = ioClient.connect(socketURL, options);
+
+				client2.on("connect", function(data){
+					// this test will only complete when done has been called twice
+					success = _.after(2, done)
+					client2.on("status", function(data){
+						success();
+					});
+					client1.on("status", function(data){
+						success();
+					});
+					client1.emit("move", 1, 2)
+				});
+			});
+
+		}),
 		it('should be Red to play first', function(done){
-			var client = io.connect(socketURL, options);
+			var client = ioClient.connect(socketURL, options);
 			client.on("connect", function(data){
 				client.emit("player");
 				client.on("player", function(player){
@@ -132,8 +153,7 @@ describe('Game', function(){
 			});
 		}),
 		it('should be Black to play after a move', function(done){
-			var client = io.connect(socketURL, options);
-			var onceDone = _.once(done);
+			var client = ioClient.connect(socketURL, options);
 			client.on("connect", function(data){
 				client.emit("move", 1, 2)
 				client.on("status", function(data){
@@ -144,7 +164,7 @@ describe('Game', function(){
 					client.on("player", function(player){
 						console.log('player')
 						player.should.equal('black');
-						onceDone();
+						done()
 					});
 				});
 			});

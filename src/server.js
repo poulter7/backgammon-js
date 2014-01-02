@@ -72,8 +72,8 @@ loadIO = function(server){
 		socket.on("move", function(pos, roll) {
 			currentGame.progressPiece(pos, roll)
 			currentPlayer = currentPlayer.opponent();
-			socket.emit("status", currentGame.state())
-			return socket.emit("dice", currentDice)
+			io.sockets.emit("status", currentGame.state())
+			return io.sockets.emit("dice", currentDice)
 		});
 		socket.on("dice", function(){
 			return socket.emit("dice", currentDice);
@@ -93,4 +93,10 @@ stop = function(cb){
 	cb()
 }
 module.exports.start = start;
+module.exports.resetServer = function(){
+	newGame();
+	io.sockets.clients().forEach(
+		function(socket){socket.disconnect(true)}
+	)
+}
 module.exports.stop = stop;
