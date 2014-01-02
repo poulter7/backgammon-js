@@ -70,6 +70,7 @@ loadIO = function(server){
 			return socket.emit("player", currentPlayer)
 		});
 		socket.on("move", function(pos, roll) {
+			console.log('Moving: ', pos, ' ', roll)
 			currentGame.progressPiece(pos, roll)
 			currentPlayer = currentPlayer.opponent();
 			io.sockets.emit("status", currentGame.state())
@@ -88,15 +89,18 @@ start = function(port, cb){
 	newGame();
 }
 
+dropAllClients = function(){
+	io.sockets.clients().forEach(function(socket){socket.disconnect(true)});
+}
+
 stop = function(cb){
+	dropAllClients();
 	server.close();
 	cb()
 }
 module.exports.start = start;
 module.exports.resetServer = function(){
 	newGame();
-	io.sockets.clients().forEach(
-		function(socket){socket.disconnect(true)}
-	)
+	dropAllClients();
 }
 module.exports.stop = stop;

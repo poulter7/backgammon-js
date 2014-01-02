@@ -39,7 +39,7 @@ describe('Game', function(){
 			waitFor(
 				browser, 
 				function(b){
-					return  b.success && b.queryAll("circle").length > 0;
+					return  b.success && b.queryAll("circle").length > 0 && browser.queryAll("#dice a").length > 0
 				}, function(){
 					$ = jQuery(browser.window)
 					$.fn.d3Click = function () {
@@ -62,6 +62,7 @@ describe('Game', function(){
 		}),
 		it('should be able to see main board', function(){
 			browser.queryAll("circle").length.should.be.equal(30);
+			browser.queryAll("#dice a").length.should.be.above(0);
 		}),
 		it('should be able to select a selectable piece on the board', function(){
 			var circle= $('circle[pos="1"][index="1"]').first()
@@ -74,6 +75,26 @@ describe('Game', function(){
 			circle.attr('class').should.equal('red')
 			circle.d3Click()
 			circle.attr('class').should.equal('red')
+		}),
+		it('should be possible to move a piece', function(done){
+			this.timeout(1000)
+			locationToMoveFrom = 'circle[pos="1"][index="1"]'
+			locationToMoveTo   = 'circle[pos="7"][index="0"]'
+
+			// target should be empty
+			$(locationToMoveTo).length.should.equal(0)
+
+			var piece = $(locationToMoveFrom).first().d3Click()
+			var die = $('#dice a').first().d3Click()
+
+			waitFor(
+				browser, 
+				function(b){return $(locationToMoveFrom).length === 0}, // wait for the refresh
+				function(){
+					$(locationToMoveTo).length.should.equal(1) // assert the correct move has happened
+					done()
+				}
+			);
 		})
 	})
 	describe('#view', function(){

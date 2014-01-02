@@ -93,7 +93,7 @@ deselect = function() {
 }
 
 selectDice = function(die){
-	client.emit('move', selected.position, parseInt(die.text))
+	client.emit('move', selected.position, parseInt(die.__data__))
 }
 
 selectPiece = function(circle){
@@ -109,17 +109,19 @@ selectPiece = function(circle){
 }
 
 render_dice = function(dice){
+	console.log('Render dice')
 	pieces = d3.select("#dice")
 		.selectAll("a")
 		.data(dice)
 		.enter()
 		.append("a")
-		.on('click', function(d){selectDice(this)})
+		.on('click', function(d){console.log('Dice', this.__data__); selectDice(this)})
 		.text(_.identity)
 }
 
 render_board = function(data){
-	deselect()
+	deselect();
+	console.log('Rendering Board');
 
 	// position -> count map
 	var perPositionCount = _.countBy(data, _.values);
