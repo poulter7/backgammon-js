@@ -57,8 +57,9 @@ Player.prototype = {
 	},
 	canBearOff: function(pos, roll){
 		var nonHomeIndices = this.color == 'red'? _.range(1, 19) : _.range(7, 25);
-		var homeIndices = this.color == 'red'? _.range(19, 25) : _.range(1, 7);
 		var nonHomeValues = _.values(_.pick(this.state, nonHomeIndices));
+		var nonHomeCount = _.reduce(nonHomeValues, function(x, y){return x + y}, 0);
+		var homeIndices = this.color == 'red'? _.range(19, 25) : _.range(1, 7);
 		var homeSubBoard = _.pick(this.state, homeIndices);
 
 		var homeValues = [];
@@ -73,8 +74,7 @@ Player.prototype = {
 		f = this.color == 'red' ? _.min : _.max;
 		furthestPip = f(homeValues);
 
-
-		return _.size(nonHomeValues) == 0 && this.bar == 0 && furthestPip == pos;
+		return nonHomeCount == 0 && this.bar == 0 && furthestPip == pos;
 			
 	},
 	placePiece: function(target, roll){
@@ -110,9 +110,15 @@ Player.prototype = {
 	},
 	validMove: function(pos, roll){
 		var target = this.targetPosition(pos, roll);
-		var validIfBearOff = !this.board.wouldBearOff(target) || (this.canBearOff(pos, roll));
-		return (this.canMoveToTarget(target) && 
-			this.canMovePieceAt(pos) &&
+		var canBearOff = this.canBearOff(pos, roll);
+		var notBearingOff = !this.board.wouldBearOff(target)
+		var validIfBearOff = notBearingOff || canBearOff;
+		var canMoveTo = this.canMoveToTarget(target);
+		var canMoveFrom = this.canMovePieceAt(pos);
+
+		return (
+			canMoveTo && 
+			canMoveFrom &&
 			validIfBearOff
 		)
 	},

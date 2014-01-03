@@ -216,12 +216,26 @@ describe('Board', function(){
 				board.red.piecesAt(24).should.equal(0);
 				board.home.red.should.equal(1);
 			}),
+			it('should be able to bear off successively', function() {
+				var board = new Board();
+				board.redState = {24:2};
+				board.blackState = {1:2};
+
+				board.moveBlack(1, 1);
+				board.black.piecesAt(1).should.equal(1);
+				board.black.canBearOff(1, 1).should.be.true;
+				board.home.black.should.equal(1);
+
+				board.moveRed(24, 1);
+				board.red.canBearOff(24, 1).should.be.true;
+				board.red.piecesAt(24).should.equal(1);
+				board.home.red.should.equal(1);
+			}),
 			it('should not be able to bear off if there are pieces outside of the home board', function(){
 				var board = new Board();
 				board.redState = {1: 1, 24:1};
 				board.red.canBearOff(24, 2).should.not.be.ok;
 				board.red.validMove(24, 2).should.not.be.ok;
-
 			}),
 			it('should not be able to bear off if there are pieces on the bar', function(){
 				var board = new Board();
