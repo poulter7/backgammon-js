@@ -69,13 +69,15 @@ describe('Game', function(){
 			circle.attr('class').should.equal('red')
 			circle.d3Click()
 			circle.attr('class').should.equal('red selected')
-		})
+		}),
 		it('should not be possible to select a piece which is not on the top of its stack', function(){
 			var circle= $('circle[pos="1"][index="0"]').first()
 			circle.attr('class').should.equal('red')
 			circle.d3Click()
 			circle.attr('class').should.equal('red')
 		}),
+		it.skip('should be possible to select any piece on the bar', function(){
+		})
 		it('should be possible to move a piece', function(done){
 			this.timeout(1000)
 			locationToMoveFrom = 'circle[pos="1"][index="1"]'
@@ -96,7 +98,7 @@ describe('Game', function(){
 				}
 			);
 		})
-	})
+	}),
 	describe('#view', function(){
 		before(function(done){
 			app_module.start(5000);
@@ -189,6 +191,23 @@ describe('Game', function(){
 					});
 				});
 			});
+		}),
+		it.skip('should be possible to capture Black piece', function(done){
+			var client = ioClient.connect(socketURL, options);
+			display = function(data){console.log(data)}
+			client.on('connect', function(){
+				client.emit("move", 1, 6)
+				client.once("status", function(data){
+					client.emit("move", 13, 6)
+					client.once("status", function(data){
+						client.emit("move", 1, 6)
+						client.once("status", function(data){
+							console.log(data.length)
+							done();
+						})
+					})
+				})
+			})
 		})
 	})
 })
