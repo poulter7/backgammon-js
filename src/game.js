@@ -48,6 +48,8 @@ Player.prototype = {
 	canMovePieceAt: function(pos){
 		if (pos == 'bar'){
 			return true;
+		} else if (pos == 'home') {
+			return false;
 		} else {
 			return this.board.bar[this.color] == 0;
 		}

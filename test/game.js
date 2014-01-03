@@ -256,6 +256,11 @@ describe('Board', function(){
 				board.redState = {21:0, 22:1, 24:1};
 				board.red.validMove(24, 2).should.not.be.ok;
 				board.red.validMove(22, 2).should.be.ok;
+			}),
+			it('should not be able to be able to move a piece which is on the home col', function(){
+				var board = new Board()
+				board.home = {red: 1, black: 3};
+				board.red.validMove('home', 1).should.not.be.ok;
 			})
 		}),
 		describe('#display-state', function(){
