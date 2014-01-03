@@ -93,6 +93,7 @@ deselect = function() {
 }
 
 selectDice = function(die){
+	console.log('Dice click - pos ', selected.position, ' ', parseInt(die.__data__))
 	client.emit('move', selected.position, parseInt(die.__data__))
 }
 

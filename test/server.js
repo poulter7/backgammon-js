@@ -5,7 +5,7 @@ var assert = require('assert')
 , jQuery = require('jquery')
 , should = require('should')
 , ioClient= require('socket.io-client')
-, Browser = require("zombie");
+, Browser = require("zombie")
 
 var browser = undefined
 var socketURL = 'http://0.0.0.0:5000'
@@ -30,10 +30,12 @@ waitFor = function(browser, precondition, callback){
 
 describe('Game', function(){
 	describe('#play', function(){
-		before(function(done){
-			// setup the browser and jQuery
-			this.timeout(10000);
+		before(function(){
 			app_module.start(5000);
+		}),
+		beforeEach(function(done){
+			app_module.resetServer(seed=4);
+			// setup the browser and jQuery
 			browser = new Browser()
 			browser.visit("http://0.0.0.0:5000")
 			waitFor(
@@ -79,7 +81,7 @@ describe('Game', function(){
 		it.skip('should be possible to select any piece on the bar', function(){
 		})
 		it('should be possible to move a piece', function(done){
-			this.timeout(1000)
+			this.timeout(3000)
 			locationToMoveFrom = 'circle[pos="1"][index="1"]'
 			locationToMoveTo   = 'circle[pos="7"][index="0"]'
 
@@ -105,7 +107,7 @@ describe('Game', function(){
 			done();
 		}),
 		beforeEach(function(){
-			app_module.resetServer();
+			app_module.resetServer(seed=4);
 		}),
 		after(function(done){
 			app_module.stop(done);
@@ -190,6 +192,40 @@ describe('Game', function(){
 						done()
 					});
 				});
+			});
+		}),
+		it('should roll dice between moves', function(done){
+			var client = ioClient.connect(socketURL, options);
+			// 6,6,6,6 - move(1,6)  RED
+			// 4,2     - move(13,4) BLACK
+			// 6,6,6,6 - move(24,6) RED
+			// 5,4     - move(9, 5) BLACK
+			// 5,4     - move(7, 4) RED
+			// 2,1     - move(2, 1) BLACK
+			// 6,2     ->
+			this.timeout(10000);
+			var i = 0
+			doneAfter5 = _.after(5, done) 
+			diceCallback = function(dice){
+				console.log(dice, i)
+				var targets = {
+					0: [4, 2],
+					1: [6, 6, 6, 6],
+					2: [5, 4],
+					3: [5, 4],
+					4: [2, 1],
+				}
+				dice.should.eql(targets[i])
+				i += 1;
+				doneAfter5()
+			}
+			client.on("dice", diceCallback)
+			client.on("connect", function(data){
+				client.emit("move", 1, 6);
+				client.emit("move", 13, 4);
+				client.emit("move", 24, 6);
+				client.emit("move", 9, 5);
+				client.emit("move", 2, 1);
 			});
 		}),
 		it.skip('should be possible to capture Black piece', function(done){

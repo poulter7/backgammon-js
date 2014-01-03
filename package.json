@@ -7,7 +7,8 @@
     "express3-handlebars": "*",
     "less-middleware": "*",
     "d3": "*",
-    "socket.io": "*"
+    "socket.io": "*",
+    "chance": "*"
   },
   "devDependencies": {
     "jquery": "*",

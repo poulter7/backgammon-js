@@ -1,15 +1,33 @@
-game = require('./game.js')
+var game = require('./game.js')
+var Chance = require('chance');
 
 currentGame = undefined
 currentPlayer = undefined
 
+
 rollDice = function(){
+	var x = chance.d6();
+	var y = chance.d6();
+	var ls = []
+	console.log('......', x, y)
+	if (x === y){
+		ls.push(x);
+		ls.push(y)
+	} 
+	ls.push(x);
+	ls.push(y);
+	return ls
 }
 
-newGame = function(){
+newGame = function(seed){
+	if (seed){
+		chance = new Chance(seed);
+	} else {
+		chance = new Chance();
+	}
 	currentGame = game.initialBoard();
 	currentPlayer = 'red';
-	currentDice = [6,6,6,6];
+	currentDice = rollDice(); 
 }
 
 module.exports.newGame = newGame;
@@ -73,6 +91,7 @@ loadIO = function(server){
 			console.log('Moving: ', pos, ' ', roll)
 			currentGame.progressPiece(pos, roll)
 			currentPlayer = currentPlayer.opponent();
+			currentDice = rollDice();
 			io.sockets.emit("status", currentGame.state())
 			return io.sockets.emit("dice", currentDice)
 		});
@@ -83,10 +102,10 @@ loadIO = function(server){
 	return io;
 }
 
-start = function(port, cb){
+start = function(port, cb, seed){
 	server = launchApp(loadApp(), port);
 	io = loadIO(server);
-	newGame();
+	newGame(seed);
 }
 
 dropAllClients = function(){
@@ -99,8 +118,8 @@ stop = function(cb){
 	cb()
 }
 module.exports.start = start;
-module.exports.resetServer = function(){
-	newGame();
+module.exports.resetServer = function(seed){
 	dropAllClients();
+	newGame(seed);
 }
 module.exports.stop = stop;
