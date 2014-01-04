@@ -90,6 +90,8 @@ describe('Game', function(){
 
 			var piece = $(locationToMoveFrom).first().d3Click()
 			var die = $('#dice a').first().d3Click()
+			dice = $('#dice a')
+			console.log(die)
 
 			waitFor(
 				browser, 

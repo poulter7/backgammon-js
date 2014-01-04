@@ -1,6 +1,7 @@
 <h1>Backgammon-js</h1>
 <h2>Feel free to stay a while and play a game</h2>
 <div id="game-board">
+	<span>
 
 	<svg width="710" height="500">
 	<g class="background">
@@ -45,9 +46,31 @@
 	<g id="pieces">
 	</g>
 	</svg>
+</span>
+<span id='chat'>
+	<div id='chat'>
+	Write a message: 
+	<div><input id=input placeholder=you-chat-here /></div>
+	<div id=box></div>
+	<script src=http://cdn.pubnub.com/pubnub.min.js></script>
+	<script>(function(){
+		var box = PUBNUB.$('box'), input = PUBNUB.$('input'), channel = 'chat';
+		PUBNUB.subscribe({
+			channel : channel,
+			callback : function(text) { box.innerHTML = (''+text).replace( /[<>]/g, '' ) + '<br>' + box.innerHTML }
+		});
+		PUBNUB.bind( 'keyup', input, function(e) {
+			(e.keyCode || e.charCode) === 13 && PUBNUB.publish({
+				channel : channel, message : input.value, x : (input.value='')
+			})
+		} )
+	})()</script>
+</div>
+</span>
 </div>
 <div id="dice">
 </div>
+
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src='javascripts/d3.js'></script>
 <script src='javascripts/jquery.js'></script>
