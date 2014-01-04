@@ -93,20 +93,23 @@ loadIO = function(server){
 			return socket.emit("player", currentPlayer)
 		});
 		socket.on("move", function(pos, rollIndex) {
-			roll = currentDice[rollIndex].val
-			console.log('Moving: ', pos, ' ', roll)
-			var success = currentGame.progressPiece(pos, roll)
-			if (success){
-				currentDice[rollIndex].rolled = true
-			}
-			var incomplete = _.contains(
-				_.pluck(currentDice, 'rolled'),
-				false
-			)
-			if (!incomplete){
-				currentPlayer = currentPlayer.opponent();
-				currentDice = rollDice();
-				io.sockets.emit("player", currentPlayer)
+			selectedDice = currentDice[rollIndex];
+			if (selectedDice.rolled == false){
+				roll = selectedDice.val
+				console.log('Moving: ', pos, ' ', roll)
+				var success = currentGame.progressPiece(pos, roll)
+				if (success){
+					currentDice[rollIndex].rolled = true
+				}
+				var incomplete = _.contains(
+					_.pluck(currentDice, 'rolled'),
+					false
+				)
+				if (!incomplete){
+					currentPlayer = currentPlayer.opponent();
+					currentDice = rollDice();
+					io.sockets.emit("player", currentPlayer)
+				}
 			}
 			io.sockets.emit("status", currentGame.state())
 			return io.sockets.emit("dice", currentDice)

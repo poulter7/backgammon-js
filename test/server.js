@@ -224,6 +224,25 @@ describe('Game', function(){
 				});
 			});
 		}),
+		it('should not be able to use the same die twice', function(done){
+			var client = ioClient.connect(socketURL, options);
+			client.on("connect", function(){
+				client.emit("move", 1, 0);
+				client.once("status", function(data1){
+					var pos1 = _.countBy(data1, _.values);
+					pos1['1,red'].should.equal(1);
+					pos1['7,red'].should.equal(1);
+					client.emit("move", 1, 0);
+
+					client.once("status", function(data2){
+						var pos2 = _.countBy(data2, _.values);
+						pos2['1,red'].should.equal(1);
+						pos2['7,red'].should.equal(1);
+						done();
+					})
+				})
+			})
+		}),
 		it('should be Black to play after a move', function(done){
 			var client = ioClient.connect(socketURL, options);
 			client.on("connect", function(data){
@@ -302,7 +321,7 @@ describe('Game', function(){
 				})
 			})
 		}),
-		it('should not make a move out of turn', function(done){
+		it.skip('should not make a move out of turn', function(done){
 			var client = ioClient.connect(socketURL, options);
 			client.on("connect", function(){
 				client.emit("move", 24, 0);
