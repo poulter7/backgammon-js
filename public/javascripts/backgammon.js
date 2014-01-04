@@ -111,6 +111,10 @@ selectPiece = function(circle){
 
 render_dice = function(dice){
 	console.log('Render dice')
+	d3.select("#dice")
+		.selectAll("a")
+		.remove();
+
 	pieces = d3.select("#dice")
 		.selectAll("a")
 		.data(dice)

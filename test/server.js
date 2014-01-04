@@ -84,20 +84,21 @@ describe('Game', function(){
 			this.timeout(3000)
 			locationToMoveFrom = 'circle[pos="1"][index="1"]'
 			locationToMoveTo   = 'circle[pos="7"][index="0"]'
+			diceStr = '#dice a'
 
 			// target should be empty
 			$(locationToMoveTo).length.should.equal(0)
 
 			var piece = $(locationToMoveFrom).first().d3Click()
-			var die = $('#dice a').first().d3Click()
-			dice = $('#dice a')
-			console.log(die)
+			var die = $(diceStr).first().d3Click()
+			$(diceStr).text().should.equal('6666')
 
 			waitFor(
 				browser, 
 				function(b){return $(locationToMoveFrom).length === 0}, // wait for the refresh
 				function(){
 					$(locationToMoveTo).length.should.equal(1) // assert the correct move has happened
+					$(diceStr).text().should.equal('42')
 					done()
 				}
 			);
