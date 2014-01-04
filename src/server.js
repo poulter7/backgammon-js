@@ -1,22 +1,27 @@
 var game = require('./game.js')
 var Chance = require('chance');
+var _ = require('underscore');
 
 currentGame = undefined
 currentPlayer = undefined
 
-
 rollDice = function(){
 	var x = chance.d6();
 	var y = chance.d6();
-	var ls = []
 	console.log('......', x, y)
 	if (x === y){
-		ls.push(x);
-		ls.push(y)
-	} 
-	ls.push(x);
-	ls.push(y);
-	return ls
+		return [
+			{'val':x, 'rolled':false},
+			{'val':y, 'rolled':false},
+			{'val':x, 'rolled':false},
+			{'val':y, 'rolled':false},
+		]
+	}  else {
+		return [
+			{'val':x, 'rolled':false},
+			{'val':y, 'rolled':false},
+		]
+	}
 }
 
 newGame = function(seed){
@@ -87,11 +92,22 @@ loadIO = function(server){
 		socket.on("player", function() {
 			return socket.emit("player", currentPlayer)
 		});
-		socket.on("move", function(pos, roll) {
+		socket.on("move", function(pos, rollIndex) {
+			roll = currentDice[rollIndex].val
 			console.log('Moving: ', pos, ' ', roll)
-			currentGame.progressPiece(pos, roll)
-			currentPlayer = currentPlayer.opponent();
-			currentDice = rollDice();
+			var success = currentGame.progressPiece(pos, roll)
+			if (true){
+				currentDice[rollIndex].rolled = true
+			}
+			var incomplete = _.contains(
+				_.pluck(currentDice, 'rolled'),
+				false
+			)
+			if (!incomplete){
+				currentPlayer = currentPlayer.opponent();
+				currentDice = rollDice();
+				io.sockets.emit("player", currentPlayer)
+			}
 			io.sockets.emit("status", currentGame.state())
 			return io.sockets.emit("dice", currentDice)
 		});

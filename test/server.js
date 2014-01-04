@@ -79,8 +79,39 @@ describe('Game', function(){
 			circle.d3Click()
 			circle.attr('class').should.equal('red')
 		}),
+		it("should be possible to read who's move it is", function(){
+			$('#player').text().should.equal('Red')
+		}),
 		it.skip('should be possible to select any piece on the bar', function(){
-		})
+		}),
+		it('should be possible to watch a full move complete and have the UI update the the next player', function(done){
+			client = ioClient.connect(socketURL, options);
+			checkGameState = function(){
+				var diceStr = '#dice a';
+				waitFor(
+					browser,
+					function(b){
+						return $(diceStr).text() == '42';	// dice have updated
+					},
+					function(){
+						// confirm that the UI has updated, new player
+						
+						$('#player').text().should.equal('Black')
+						done();
+					}
+				);
+			}
+
+			checkAfter4Moves = _.after(4, checkGameState);
+			client.on('status', checkAfter4Moves);
+			client.emit("move", 1, 0);
+			client.emit("move", 1, 1);
+			client.emit("move", 12, 2);
+			client.emit("move", 12, 3);
+
+			// check the dice have updated to the next set
+			// check that the player has updated
+		}),
 		it('should be possible to move a piece', function(done){
 			this.timeout(3000)
 			locationToMoveFrom = 'circle[pos="1"][index="1"]'
@@ -99,7 +130,11 @@ describe('Game', function(){
 				function(b){return $(locationToMoveFrom).length === 0}, // wait for the refresh
 				function(){
 					$(locationToMoveTo).length.should.equal(1) // assert the correct move has happened
-					$(diceStr).text().should.equal('42')
+					$(diceStr).text().should.equal('6666')
+					$(diceStr).eq(0).hasClass('used').should.be.true
+					$(diceStr).eq(1).hasClass('used').should.be.false
+					$(diceStr).eq(2).hasClass('used').should.be.false
+					$(diceStr).eq(3).hasClass('used').should.be.false
 					done()
 				}
 			);
@@ -138,14 +173,19 @@ describe('Game', function(){
 			});
 		}),
 		it('should be possible to retrieve the current dice roll', function(done){
+
 			var client = ioClient.connect(socketURL, options);
 			client.on("connect", function(data){
 				client.emit("dice");
 				client.on("dice", function(dice){
-					assert.deepEqual(
-						dice,
-						[6,6,6,6]
-					);
+					dice.should.eql(
+						[
+							{"val":6,"rolled":false},
+							{"val":6,"rolled":false},
+							{"val":6,"rolled":false},
+							{"val":6,"rolled":false}
+						]
+					)
 					done();
 				});
 			});
@@ -184,21 +224,31 @@ describe('Game', function(){
 		it('should be Black to play after a move', function(done){
 			var client = ioClient.connect(socketURL, options);
 			client.on("connect", function(data){
-				client.emit("move", 1, 2)
-				client.on("status", function(data){
-					client.emit("player");
+				client.emit("move", 1, 0)
+				client.once("status", function(data){
+					// check the update of the last move
 					var positionSummary = _.countBy(data, _.values);
+					console.log(positionSummary)
 					positionSummary['1,red'].should.equal(1);
-					positionSummary['3,red'].should.equal(1);
+					positionSummary['7,red'].should.equal(1);
+
+					// make some more moves
+					client.emit("move", 1, 1)
+					client.emit("move", 12, 2)
+					client.emit("move", 12, 3)
+
+					// check if the player changed
 					client.on("player", function(player){
 						console.log('player')
 						player.should.equal('black');
-						done()
+						done();
 					});
+
+
 				});
 			});
 		}),
-		it('should roll dice between moves', function(done){
+		it('should roll dice between moves completed', function(done){
 			var client = ioClient.connect(socketURL, options);
 			// 6,6,6,6 - move(1,6)  RED
 			// 4,2     - move(13,4) BLACK
@@ -211,25 +261,26 @@ describe('Game', function(){
 			var i = 0
 			doneAfter5 = _.after(5, done) 
 			diceCallback = function(dice){
+				console.log('Roll', i)
 				console.log(dice, i)
-				var targets = {
-					0: [4, 2],
-					1: [6, 6, 6, 6],
-					2: [5, 4],
-					3: [5, 4],
-					4: [2, 1],
-				}
+				var targets = [
+					{0: {'val':6, 'rolled':true}, 1: {'val':6, 'rolled':false}, 2: {'val':6, 'rolled':false}, 3: {'val':6, 'rolled':false}},
+					{0: {'val':6, 'rolled':true}, 1: {'val':6, 'rolled':true}, 2: {'val':6, 'rolled':false}, 3: {'val':6, 'rolled':false}},
+					{0: {'val':6, 'rolled':true}, 1: {'val':6, 'rolled':true}, 2: {'val':6, 'rolled':true}, 3: {'val':6, 'rolled':false}},
+					{0: {'val':4, 'rolled':false}, 1: {'val':2, 'rolled':false}, },
+					{0: {'val':4, 'rolled':false}, 1: {'val':2, 'rolled':true}, }
+				]
 				dice.should.eql(targets[i])
 				i += 1;
 				doneAfter5()
 			}
 			client.on("dice", diceCallback)
 			client.on("connect", function(data){
-				client.emit("move", 1, 6);
-				client.emit("move", 13, 4);
-				client.emit("move", 24, 6);
-				client.emit("move", 9, 5);
-				client.emit("move", 2, 1);
+				client.emit("move", 1, 0);
+				client.emit("move", 1, 1);
+				client.emit("move", 12, 2);
+				client.emit("move", 12, 3);
+				client.emit("move", 13, 1);
 			});
 		}),
 		it.skip('should be possible to capture Black piece', function(done){

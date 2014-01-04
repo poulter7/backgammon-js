@@ -12,12 +12,16 @@ window.onload = function(){
 	client.on("connect", function(data){
 		client.emit("status");
 		client.emit("dice");
+		client.emit("player");
+	});
+	client.on("player", function(player){
+		update_player(player);
 	});
 	client.on("status", function(board){
-		render_board(board)
+		render_board(board);
 	});
 	client.on("dice", function(dice){
-		render_dice(dice)
+		render_dice(dice);
 	});
 }
 
@@ -92,9 +96,13 @@ deselect = function() {
 	selected = undefined;
 }
 
-selectDice = function(die){
-	console.log('Dice click - pos ', selected.position, ' ', parseInt(die.__data__))
-	client.emit('move', selected.position, parseInt(die.__data__))
+selectDice = function(dieIndex){
+	console.log('Dice click - pos ', selected.position, ' ', parseInt(dieIndex))
+	client.emit('move', selected.position, dieIndex);//parseInt(die.__data__))
+}
+
+update_player = function(player){
+	$('#player').text(player.charAt(0).toUpperCase() + player.slice(1))
 }
 
 selectPiece = function(circle){
@@ -115,13 +123,15 @@ render_dice = function(dice){
 		.selectAll("a")
 		.remove();
 
+	console.log(dice)
 	pieces = d3.select("#dice")
 		.selectAll("a")
 		.data(dice)
 		.enter()
 		.append("a")
-		.on('click', function(d){console.log('Dice', this.__data__); selectDice(this)})
-		.text(_.identity)
+		.classed("used", function(d){ return d.rolled})
+		.on('click', function(d, i){console.log('Dice', d); selectDice(i)})
+		.text(function(d){return d.val})
 }
 
 render_board = function(data){
