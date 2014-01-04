@@ -34,6 +34,7 @@ describe('Game', function(){
 			app_module.start(5000);
 		}),
 		beforeEach(function(done){
+			this.timeout(5000)
 			app_module.resetServer(seed=4);
 			// setup the browser and jQuery
 			browser = new Browser()
