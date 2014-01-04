@@ -84,6 +84,8 @@ describe('Game', function(){
 		}),
 		it.skip('should be possible to select any piece on the bar', function(){
 		}),
+		it.skip("shouldn't be able to select a piece which isn't yours", function(){
+		}),
 		it('should be possible to watch a full move complete and have the UI update the the next player', function(done){
 			client = ioClient.connect(socketURL, options);
 			checkGameState = function(){
@@ -132,6 +134,7 @@ describe('Game', function(){
 					$(locationToMoveTo).length.should.equal(1) // assert the correct move has happened
 					$(diceStr).text().should.equal('6666')
 					$(diceStr).eq(0).hasClass('used').should.be.true
+					// should not be actionable
 					$(diceStr).eq(1).hasClass('used').should.be.false
 					$(diceStr).eq(2).hasClass('used').should.be.false
 					$(diceStr).eq(3).hasClass('used').should.be.false
@@ -283,6 +286,32 @@ describe('Game', function(){
 				client.emit("move", 13, 1);
 			});
 		}),
+		it('should make no dice change if the move was invalid', function(done){
+			var client = ioClient.connect(socketURL, options);
+			client.on("connect", function(){
+				client.emit("move", 19, 0);
+				client.on("dice", function(dice){
+					console.log(dice);
+					dice.should.eql([
+						{'val':6, 'rolled':false}, 
+						{'val':6, 'rolled':false}, 
+						{'val':6, 'rolled':false}, 
+						{'val':6, 'rolled':false}
+					])
+					done();
+				})
+			})
+		}),
+		it('should not make a move out of turn', function(done){
+			var client = ioClient.connect(socketURL, options);
+			client.on("connect", function(){
+				client.emit("move", 24, 0);
+				client.on("dice", function(dice){
+					console.log(dice);
+					done();
+				})
+			})
+		})
 		it.skip('should be possible to capture Black piece', function(done){
 			var client = ioClient.connect(socketURL, options);
 			display = function(data){console.log(data)}

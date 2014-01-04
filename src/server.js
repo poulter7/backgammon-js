@@ -96,7 +96,7 @@ loadIO = function(server){
 			roll = currentDice[rollIndex].val
 			console.log('Moving: ', pos, ' ', roll)
 			var success = currentGame.progressPiece(pos, roll)
-			if (true){
+			if (success){
 				currentDice[rollIndex].rolled = true
 			}
 			var incomplete = _.contains(

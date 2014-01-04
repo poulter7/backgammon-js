@@ -54,6 +54,12 @@ describe('Board', function(){
 			board.red.piecesAt(1).should.equal(1);
 			board.red.piecesAt(2).should.equal(0);
 			board.black.piecesAt(2).should.equal(2)
+		}),
+		it('should not be an invlid move returns false', function(){
+			var board = new Board();
+			board.blackState = {2:2};
+			board.redState = {1:1};
+			board.progressPiece(1, 1).should.be.false;
 		})
 	})
 	describe('#player', function(){
@@ -129,28 +135,28 @@ describe('Board', function(){
 				var board = new Board();
 				board.redState = {1:1};
 				board.bar = {red:1, black:0};
-				board.red.popBar(1);
+				board.red.popBar(1).should.be.true;
 				board.bar.red.should.equal(0);
 				board.red.piecesAt(1).should.equal(2)
 			})
 			it('should be able to move a red piece off of the bar', function(){
 				var board = new Board();
 				board.bar = {red:1, black: 0};
-				board.red.popBar(1);
+				board.red.popBar(1).should.be.true;
 				board.bar.red.should.equal(0);
 				board.red.piecesAt(1).should.equal(1);
 			}),
 			it('should be able to move a red piece off of the bar using lift', function(){
 				var board = new Board();
 				board.bar = {red:1, black: 0};
-				board.moveRed('bar', 1);
+				board.moveRed('bar', 1).should.be.true;
 				board.bar.red.should.equal(0);
 				board.red.piecesAt(1).should.equal(1);
 			}),
 			it('should be able to move a red piece off of the bar to a different first six point', function(){
 				var board = new Board();
 				board.bar = {red: 1, black: 0};
-				board.red.popBar(6);
+				board.red.popBar(6).should.be.true
 				board.bar.red.should.equal(0);
 				board.red.piecesAt(6).should.equal(1);
 			}),
@@ -158,7 +164,7 @@ describe('Board', function(){
 				var board = new Board();
 				board.blackState = {1:1};;
 				board.bar = {red:1, black:0};
-				board.red.popBar(1);
+				board.red.popBar(1).should.be.true;
 				board.red.piecesAt(1).should.equal(1, 'Pip successfully entered');
 				board.black.piecesAt(1).should.equal(0, 'Hit pip removed');
 				board.bar.black.should.equal(1, 'Hit pip on bar');
@@ -167,7 +173,7 @@ describe('Board', function(){
 				var board = new Board();
 				board.blackState = {1:2};
 				board.bar = {red:1, black:0};
-				board.red.popBar(1);
+				board.red.popBar(1).should.be.false;
 				board.bar.red.should.equal(1);
 				board.red.piecesAt(1).should.equal(0);
 				board.black.piecesAt(1).should.equal(2);

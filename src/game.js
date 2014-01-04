@@ -136,6 +136,9 @@ Player.prototype = {
 		if (this.canMoveToTarget(target)){
 			this.board.bar[this.color] -= 1;
 			this.placePiece(target, roll);
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -149,10 +152,10 @@ Board.prototype = {
 		return new Player('black', this);
 	},
 	moveRed: function(pos, roll){
-		this.progressPiece(pos, roll);
+		return this.progressPiece(pos, roll);
 	},
 	moveBlack: function(pos, roll){
-		this.progressPiece(pos, roll);
+		return this.progressPiece(pos, roll);
 	},
 	toString: function(){
 		return 'Red: ' + JSON.stringify(this.redState) + '\nBlack: ' + JSON.stringify(this.blackState);
@@ -194,15 +197,19 @@ Board.prototype = {
 		}
 		if (owner){
 			if (pos === 'bar'){
-				owner.popBar(roll)
+				return owner.popBar(roll);
 			} else {
 				var target = owner.targetPosition(pos, roll);
 				if (owner.validMove(pos, roll)){
 					owner.liftPiece(pos);
 					owner.placePiece(target, roll);
+					return true;
+				} else {
+					return false;
 				}
 			}
 		}
+		return false;
 
 	},
 	wouldBearOff: function(target){
