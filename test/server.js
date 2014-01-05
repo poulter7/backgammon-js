@@ -27,7 +27,32 @@ waitFor = function(browser, precondition, callback){
 		100
 	);
 }
+loadPage = function(cb){
+	var browser = new Browser();
+	browser.visit("http://0.0.0.0:5000")
+	waitFor(
+		browser, 
+		function(b){
+			return  b.success &&
+					b.queryAll("circle").length > 0 && 
+					browser.queryAll("#dice a").length > 0
+		}, function(){
+			$ = jQuery(browser.window)
+			$.fn.d3Click = function () {
+				this.each(function (i, e) {
+					var evt = browser.window.document.createEvent("MouseEvents");
+					evt.initMouseEvent("click", true, true, browser.window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
 
+					e.dispatchEvent(evt);
+				});
+			};
+			if (cb){
+				cb();
+			}
+		}
+	)
+	return browser
+}
 describe('Game', function(){
 	describe('#play', function(){
 		before(function(){
@@ -35,28 +60,10 @@ describe('Game', function(){
 			app_module.io().set('log level', 0);
 		}),
 		beforeEach(function(done){
-			this.timeout(5000)
+			this.timeout(5000);
 			app_module.resetServer(seed=4);
 			// setup the browser and jQuery
-			browser = new Browser()
-			browser.visit("http://0.0.0.0:5000")
-			waitFor(
-				browser, 
-				function(b){
-					return  b.success && b.queryAll("circle").length > 0 && browser.queryAll("#dice a").length > 0
-				}, function(){
-					$ = jQuery(browser.window)
-					$.fn.d3Click = function () {
-						this.each(function (i, e) {
-							var evt = browser.window.document.createEvent("MouseEvents");
-							evt.initMouseEvent("click", true, true, browser.window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-
-							e.dispatchEvent(evt);
-						});
-					};
-					done();
-				}
-			)
+			browser = loadPage(done);
 		}),
 		after(function(done){
 			app_module.stop(done);
@@ -69,23 +76,42 @@ describe('Game', function(){
 			browser.queryAll("#dice a").length.should.be.above(0);
 		}),
 		it('should be able to select a selectable piece on the board', function(){
-			var circle= $('circle[pos="1"][index="1"]').first()
-			circle.attr('class').should.equal('red')
-			circle.d3Click()
-			circle.attr('class').should.equal('red selected')
+			var circle= $('circle[pos="1"][index="1"]').first();
+			circle.attr('class').should.equal('red');
+			circle.d3Click();
+			circle.attr('class').should.equal('red selected');
 		}),
 		it('should not be possible to select a piece which is not on the top of its stack', function(){
-			var circle= $('circle[pos="1"][index="0"]').first()
-			circle.attr('class').should.equal('red')
-			circle.d3Click()
-			circle.attr('class').should.equal('red')
+			var circle= $('circle[pos="1"][index="0"]').first();
+			circle.attr('class').should.equal('red');
+			circle.d3Click();
+			circle.attr('class').should.equal('red');
 		}),
 		it("should be possible to read who's move it is", function(){
-			$('#player').text().should.equal('Red')
+			$('#player').text().should.equal('Red');
+			$('#playable a').length.should.equal(0);
 		}),
 		it.skip('should be possible to select any piece on the bar', function(){
 		}),
 		it.skip("shouldn't be able to select a piece which isn't yours", function(){
+		}),
+		it("should be possible to skip a turn if no piece can be moved", function(done){
+			this.timeout(5000);
+			var c = app_module.board();
+			c.redState = {1:15};
+			c.blackState = {7:15};
+			app_module.canMove().should.be.false;
+			browser = loadPage(function(){
+				$('#playable a').length.should.equal(1);
+				$('#playable').text().should.equal('Cannot move - skip turn');
+				browser.click('#playlink');
+				browser = loadPage(function(){
+					$('#playable a').length.should.equal(0);
+					$('#player').text().should.equal('Black');
+					$('#dice a').text().should.equal('42');
+					done();
+				});
+			});
 		}),
 		it('should be possible to watch a full move complete and have the UI update the the next player', function(done){
 			client = ioClient.connect(socketURL, options);
@@ -184,12 +210,12 @@ describe('Game', function(){
 				client.emit("dice");
 				client.on("dice", function(dice){
 					dice.should.eql(
-						[
+						{dice:[
 							{"val":6,"rolled":false},
 							{"val":6,"rolled":false},
 							{"val":6,"rolled":false},
 							{"val":6,"rolled":false}
-						]
+						], playable: true}
 					)
 					done();
 				});
@@ -306,11 +332,11 @@ describe('Game', function(){
 			doneAfter5 = _.after(5, done) 
 			diceCallback = function(dice){
 				var targets = [
-					{0: {'val':6, 'rolled':true}, 1: {'val':6, 'rolled':false}, 2: {'val':6, 'rolled':false}, 3: {'val':6, 'rolled':false}},
-					{0: {'val':6, 'rolled':true}, 1: {'val':6, 'rolled':true}, 2: {'val':6, 'rolled':false}, 3: {'val':6, 'rolled':false}},
-					{0: {'val':6, 'rolled':true}, 1: {'val':6, 'rolled':true}, 2: {'val':6, 'rolled':true}, 3: {'val':6, 'rolled':false}},
-					{0: {'val':4, 'rolled':false}, 1: {'val':2, 'rolled':false}, },
-					{0: {'val':4, 'rolled':false}, 1: {'val':2, 'rolled':true}, }
+					{dice:[{'val':6, 'rolled':true}, {'val':6, 'rolled':false}, {'val':6, 'rolled':false}, {'val':6, 'rolled':false}], playable:true},
+					{dice:[{'val':6, 'rolled':true}, {'val':6, 'rolled':true},  {'val':6, 'rolled':false}, {'val':6, 'rolled':false}], playable:true},
+					{dice:[{'val':6, 'rolled':true}, {'val':6, 'rolled':true},  {'val':6, 'rolled':true},  {'val':6, 'rolled':false}], playable:true},
+					{dice:[{'val':4, 'rolled':false},{'val':2, 'rolled':false}], playable:true },
+					{dice:[{'val':4, 'rolled':false},{'val':2, 'rolled':true} ], playable:true }
 				]
 				dice.should.eql(targets[i])
 				i += 1;
@@ -330,16 +356,37 @@ describe('Game', function(){
 			client.on("connect", function(){
 				client.emit("move", 19, 0);
 				client.on("dice", function(dice){
-					dice.should.eql([
-						{'val':6, 'rolled':false}, 
-						{'val':6, 'rolled':false}, 
-						{'val':6, 'rolled':false}, 
-						{'val':6, 'rolled':false}
-					])
+					dice.should.eql(
+						{
+							dice:[
+								{'val':6, 'rolled':false}, 
+								{'val':6, 'rolled':false}, 
+								{'val':6, 'rolled':false}, 
+								{'val':6, 'rolled':false}
+							],
+							playable: true
+						}
+					)
 					done();
 				})
 			})
 		}),
+		it('should be possible determine that a move can be made', function(){
+			var c = app_module.board();
+			c.redState = {2:15};
+			c.blackState = {7:15};
+			console.log(app_module.board());
+			console.log(app_module.dice());
+			app_module.canMove().should.be.true;
+		})
+		it('should be possible determine that no move can be made', function(){
+			var c = app_module.board();
+			c.redState = {1:15};
+			c.blackState = {7:15};
+			console.log(app_module.board());
+			console.log(app_module.dice());
+			app_module.canMove().should.be.false;
+		})
 		it.skip('should be possible to capture Black piece', function(done){
 			var client = ioClient.connect(socketURL, options);
 			display = function(data){console.log(data)}

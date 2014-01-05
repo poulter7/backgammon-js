@@ -4,6 +4,7 @@ var _ = require('underscore');
 
 currentGame = undefined
 currentPlayer = undefined
+currentDice = undefined
 
 rollDice = function(){
 	var x = chance.d6();
@@ -81,16 +82,29 @@ launchApp = function(app, port){
 	return app.listen(port)
 }
 
+switchControl = function(){
+	currentPlayer = currentPlayer.opponent();
+	currentDice = rollDice();
+	io.sockets.emit("player", currentPlayer);
+}
 loadIO = function(server){
 	var io = require('socket.io').listen(server);
-
+	var s = this;
 	io.sockets.on('connection', function (socket) {
+		socket.on("pass", function(){
+			switchControl();
+			io.sockets.emit("status", currentGame.state())
+			return io.sockets.emit("dice", {dice:currentDice, playable:s.canMove()});
+		})
 		socket.on("status", function() {
 			return socket.emit("status", currentGame.state())
 		});
 		socket.on("player", function() {
 			return socket.emit("player", currentPlayer)
 		});
+		socket.on("playable", function(){
+			return socket.emit("playable", s.canMove());
+		})
 		socket.on("move", function(pos, rollIndex) {
 			var selectedDice = currentDice[rollIndex];
 			var currentPlayerPieceSelected = currentGame.owner(pos).color == currentPlayer;
@@ -105,21 +119,24 @@ loadIO = function(server){
 					false
 				);
 				if (!incomplete){
-					currentPlayer = currentPlayer.opponent();
-					currentDice = rollDice();
-					io.sockets.emit("player", currentPlayer);
+					switchControl();
 				}
 			}
 			io.sockets.emit("status", currentGame.state())
-			return io.sockets.emit("dice", currentDice)
+			return io.sockets.emit("dice", {dice:currentDice, playable:s.canMove()});
 		});
 		socket.on("dice", function(){
-			return socket.emit("dice", currentDice);
+			return socket.emit("dice", {dice:currentDice, playable:s.canMove()});
 		});
 	});
 	return io;
 }
 
+canMove = function(){
+	var dice = _.pluck(currentDice, 'val');
+	var moveable = _.map(dice, function(d){return currentGame[currentPlayer].canMoveWith(d)});
+	return _.contains(moveable, true);
+}
 start = function(port, cb, seed){
 	server = launchApp(loadApp(), port);
 	io = loadIO(server);
@@ -141,5 +158,8 @@ module.exports.resetServer = function(seed){
 	newGame(seed);
 }
 module.exports.stop = stop;
-module.exports.board = currentGame;
+module.exports.board = function(){return currentGame};
+module.exports.dice = function(){return currentDice};
+module.exports.canMove = canMove;
+module.exports.player = currentPlayer;
 module.exports.io = function(){return io};

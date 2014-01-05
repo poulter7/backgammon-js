@@ -20,8 +20,9 @@ window.onload = function(){
 	client.on("status", function(board){
 		render_board(board);
 	});
-	client.on("dice", function(dice){
-		render_dice(dice);
+	client.on("dice", function(move_status){
+		render_dice(move_status.dice);
+		render_skip_message(move_status.playable);
 	});
 }
 
@@ -116,7 +117,20 @@ selectPiece = function(circle){
 		selected = clicked;
 	}
 }
+passTurn = function(){
+	console.debug('passing'); 
+	client.emit('pass');
+}
+render_skip_message = function(playable){
+	var playableDiv = $('div#playable');
+	playableDiv.empty();
+	if (!playable){
+		var link = $('<a id="playlink" href="#">Cannot move - skip turn</a>');
+		link.click(passTurn);
+		link.appendTo(playableDiv);
+	}
 
+}
 render_dice = function(dice){
 	console.debug('Render dice')
 	d3.select("#dice")
