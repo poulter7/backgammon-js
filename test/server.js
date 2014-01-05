@@ -243,6 +243,30 @@ describe('Game', function(){
 				})
 			})
 		}),
+		it('should not be able to move a black piece when it is red to move', function(done){
+			var client = ioClient.connect(socketURL, options);
+			client.on("connect", function(){
+				client.emit("move", 24, 0);
+				client.on("status", function(board){
+					var pos = _.countBy(board, _.values);
+					console.log(pos)
+					pos.should.eql(
+						{
+							'1,red': 2,
+							'12,red': 5,
+							'17,red': 3,
+							'19,red': 5,
+							'6,black': 5,
+							'8,black': 3,
+							'13,black': 5,
+							'24,black': 2
+						}
+					)
+					done();
+				});
+
+			})
+		}),
 		it('should be Black to play after a move', function(done){
 			var client = ioClient.connect(socketURL, options);
 			client.on("connect", function(data){

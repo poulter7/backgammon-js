@@ -188,13 +188,15 @@ Board.prototype = {
 
 		return [].concat(redBar, blackBar, redHome, blackHome, redPieces, blackPieces)
 	},
-	progressPiece: function(pos, roll){
-		var player = undefined;
+	owner: function(pos){
 		if (this.red.piecesAt(pos) > 0){
-			owner = this.red;
+			return this.red;
 		} else if (this.black.piecesAt(pos) > 0){
-			owner = this.black;
+			return this.black;
 		}
+	},
+	progressPiece: function(pos, roll){
+		var owner = this.owner(pos);
 		if (owner){
 			if (pos === 'bar'){
 				return owner.popBar(roll);
