@@ -25,7 +25,7 @@ describe('Board', function(){
 			var board = new Board();
 			board.redState = {1:1};
 			board.red.piecesAt(1).should.equal(1);
-			board.moveRed(1, 1);
+			board.red.progressPiece(1, 1);
 			board.red.piecesAt(1).should.equal(0);
 			board.red.piecesAt(2).should.equal(1)
 		}),
@@ -33,14 +33,14 @@ describe('Board', function(){
 			var board = new Board();
 			board.redState = {1:1};
 			assert.equal(board.red.piecesAt(1), 1);
-			board.moveRed(1, 2);
+			board.red.progressPiece(1, 2);
 			assert.equal(board.red.piecesAt(1), 0);
 			assert.equal(board.red.piecesAt(3), 1);
 		}),
 		it('should be able to move splitting a stack', function(){
 			var board = new Board();
 			board.redState = {1:2};
-			board.moveRed(1, 1);
+			board.red.progressPiece(1, 1);
 			board.red.piecesAt(1).should.equal(1);
 			board.red.piecesAt(2).should.equal(1);
 		}),
@@ -50,7 +50,7 @@ describe('Board', function(){
 			board.redState = {1:1};
 			board.red.validMove(1, 1).should.not.be.okay;
 			board.red.canMoveToTarget(2).should.not.be.okay;
-			board.moveRed(1, 1);
+			board.red.progressPiece(1, 1);
 			board.red.piecesAt(1).should.equal(1);
 			board.red.piecesAt(2).should.equal(0);
 			board.black.piecesAt(2).should.equal(2)
@@ -59,7 +59,7 @@ describe('Board', function(){
 			var board = new Board();
 			board.blackState = {2:2};
 			board.redState = {1:1};
-			board.progressPiece(1, 1).should.be.false;
+			board.red.progressPiece(1, 1).should.be.false;
 		}),
 		it('should be able to determine what positions each player occupies', function(){
 			var board = new Board();
@@ -149,7 +149,7 @@ describe('Board', function(){
 			var board = new Board();
 			board.blackState = {12:1};
 			board.redState = {11:1};
-			board.moveRed(11, 1);
+			board.red.progressPiece(11, 1);
 			board.red.piecesAt(11).should.equal(0);
 			board.bar.black.should.equal(1)
 		})
@@ -157,7 +157,7 @@ describe('Board', function(){
 			var board = new Board();
 			board.blackState = {12:1};
 			board.redState = {11:1};
-			board.moveBlack(12, 1);
+			board.black.progressPiece(12, 1);
 			board.red.piecesAt(11).should.equal(0);
 			board.black.piecesAt(11).should.equal(1);
 			board.bar.red.should.equal(1);
@@ -174,28 +174,28 @@ describe('Board', function(){
 			var board = new Board();
 			board.redState = {1:1};
 			board.bar = {red:1, black:0};
-			board.red.popBar(1).should.be.true;
+			board.red.progressPiece('bar', 1).should.be.true;
 			board.bar.red.should.equal(0);
 			board.red.piecesAt(1).should.equal(2)
 		})
 		it('should be able to move a red piece off of the bar', function(){
 			var board = new Board();
 			board.bar = {red:1, black: 0};
-			board.red.popBar(1).should.be.true;
+			board.red.progressPiece('bar', 1).should.be.true;
 			board.bar.red.should.equal(0);
 			board.red.piecesAt(1).should.equal(1);
 		}),
 		it('should be able to move a red piece off of the bar using lift', function(){
 			var board = new Board();
 			board.bar = {red:1, black: 0};
-			board.moveRed('bar', 1).should.be.true;
+			board.red.progressPiece('bar', 1).should.be.true;
 			board.bar.red.should.equal(0);
 			board.red.piecesAt(1).should.equal(1);
 		}),
 		it('should be able to move a red piece off of the bar to a different first six point', function(){
 			var board = new Board();
 			board.bar = {red: 1, black: 0};
-			board.red.popBar(6).should.be.true
+			board.red.progressPiece('bar', 6).should.be.true
 			board.bar.red.should.equal(0);
 			board.red.piecesAt(6).should.equal(1);
 		}),
@@ -203,7 +203,7 @@ describe('Board', function(){
 			var board = new Board();
 			board.blackState = {1:1};;
 			board.bar = {red:1, black:0};
-			board.red.popBar(1).should.be.true;
+			board.red.progressPiece('bar', 1).should.be.true;
 			board.red.piecesAt(1).should.equal(1, 'Pip successfully entered');
 			board.black.piecesAt(1).should.equal(0, 'Hit pip removed');
 			board.bar.black.should.equal(1, 'Hit pip on bar');
@@ -212,7 +212,7 @@ describe('Board', function(){
 			var board = new Board();
 			board.blackState = {1:2};
 			board.bar = {red:1, black:0};
-			board.red.popBar(1).should.be.false;
+			board.red.progressPiece('bar', 1).should.be.false;
 			board.bar.red.should.equal(1);
 			board.red.piecesAt(1).should.equal(0);
 			board.black.piecesAt(1).should.equal(2);
@@ -221,7 +221,7 @@ describe('Board', function(){
 			var board = new Board();
 			board.redState = {19:1};
 			board.bar = {red:2, black:2};
-			board.black.popBar(6);
+			board.black.progressPiece('bar', 6);
 			board.black.piecesAt(19).should.equal(1);
 			board.red.piecesAt(19).should.equal(0);
 			board.bar.red.should.equal(3);
@@ -240,7 +240,7 @@ describe('Board', function(){
 			var board = new Board();
 			board.blackState = {1:1};
 			board.black.canBearOff(1, 1).should.be.ok;
-			board.progressPiece(1, 1);
+			board.black.progressPiece(1, 1);
 			board.black.piecesAt(1).should.equal(0);
 			board.home.black.should.equal(1);
 		}),
@@ -265,7 +265,7 @@ describe('Board', function(){
 			var board = new Board();
 			board.redState = {24:1};
 			board.red.canBearOff(24, 1).should.be.ok;
-			board.progressPiece(24, 1);
+			board.red.progressPiece(24, 1);
 			board.red.piecesAt(24).should.equal(0);
 			board.home.red.should.equal(1);
 		}),
@@ -274,12 +274,12 @@ describe('Board', function(){
 			board.redState = {24:2};
 			board.blackState = {1:2};
 
-			board.moveBlack(1, 1);
+			board.black.progressPiece(1, 1);
 			board.black.piecesAt(1).should.equal(1);
 			board.black.canBearOff(1, 1).should.be.true;
 			board.home.black.should.equal(1);
 
-			board.moveRed(24, 1);
+			board.red.progressPiece(24, 1);
 			board.red.canBearOff(24, 1).should.be.true;
 			board.red.piecesAt(24).should.equal(1);
 			board.home.red.should.equal(1);
@@ -295,7 +295,7 @@ describe('Board', function(){
 			board.redState = {1: 0, 24:1};
 			board.bar.red = 1;
 			board.red.canBearOff(24, 1).should.not.be.ok;
-			board.progressPiece(24, 1);
+			board.red.progressPiece(24, 1);
 			board.home.red.should.equal(0);
 		}),
 		it('should not be able to bear off a piece when another piece should be moved first', function(){

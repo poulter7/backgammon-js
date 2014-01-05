@@ -110,7 +110,7 @@ loadIO = function(server){
 			var currentPlayerPieceSelected = currentGame.owner(pos).color == currentPlayer;
 			if (!selectedDice.rolled && currentPlayerPieceSelected){
 				var roll = selectedDice.val;
-				var success = currentGame.progressPiece(pos, roll);
+				var success = currentGame[currentPlayer].progressPiece(pos, roll);
 				if (success){
 					currentDice[rollIndex].rolled = true;
 				}

@@ -1,6 +1,10 @@
 var assert = require('assert')
 var _ = require('underscore')
 
+_.any = function(ls){
+	return _.contains(ls, true);
+}
+
 function Board(redState, blackState, bar, home) {
 	this.blackState = typeof blackState !== 'undefined' ? blackState : {};
 	this.redState = typeof redState !== 'undefined' ? redState : {};
@@ -35,7 +39,7 @@ Player.prototype = {
 				_.keys(this.state), 
 				function(i){return parseInt(i)}
 			),
-			function(d, i){
+			function(d){
 				return t.piecesAt(d) > 0;
 			}
 		);
@@ -53,11 +57,7 @@ Player.prototype = {
 		return this.board[this.color.opponent()];
 	},
 	get bar(){
-		if (this.color == 'red'){
-			return this.board.bar.red;
-		} else {
-			return this.board.bar.black;
-		}
+		return this.board.bar[this.color];
 	},
 	canMovePieceAt: function(pos){
 		if (pos == 'bar'){
@@ -73,12 +73,11 @@ Player.prototype = {
 		}
 	},
 	canMoveWith: function(roll){
-		var t = this
-		var m = _.map(
+		var that = this
+		return _.any(_.map(
 			this.ownedPositions, 
-			function(d){return t.validMove(d, roll)}
-		);
-		return _.contains(m, true)
+			function(d){return that.validMove(d, roll)}
+		))
 	},
 	canMoveToTarget: function(target){
 		return this.opponent.piecesAt(target) < 2;
@@ -119,7 +118,11 @@ Player.prototype = {
 		}
 	},
 	liftPiece: function(pos){
-		this.state[pos] -= 1; 
+		if (pos === 'bar'){
+			this.board.bar[this.color] -= 1;
+		} else {
+			this.state[pos] -= 1; 
+		}
 	},
 	piecesAt: function(pos){
 		var r = {
@@ -162,10 +165,10 @@ Player.prototype = {
 			return p - roll;
 		}
 	},
-	popBar: function(roll) {
-		target = this.color == 'red' ? roll : 25 - roll;
-		if (this.canMoveToTarget(target)){
-			this.board.bar[this.color] -= 1;
+	progressPiece: function(pos, roll){
+		var target = this.targetPosition(pos, roll);
+		if (this.validMove(pos, roll)){
+			this.liftPiece(pos);
 			this.placePiece(target, roll);
 			return true;
 		} else {
@@ -181,12 +184,6 @@ Board.prototype = {
 	},
 	get black(){
 		return new Player('black', this);
-	},
-	moveRed: function(pos, roll){
-		return this.progressPiece(pos, roll);
-	},
-	moveBlack: function(pos, roll){
-		return this.progressPiece(pos, roll);
 	},
 	toString: function(){
 		return 'Red: ' + JSON.stringify(this.redState) + '\nBlack: ' + JSON.stringify(this.blackState);
@@ -225,25 +222,6 @@ Board.prototype = {
 		} else if (this.black.piecesAt(pos) > 0){
 			return this.black;
 		}
-	},
-	progressPiece: function(pos, roll){
-		var owner = this.owner(pos);
-		if (owner){
-			if (pos === 'bar'){
-				return owner.popBar(roll);
-			} else {
-				var target = owner.targetPosition(pos, roll);
-				if (owner.validMove(pos, roll)){
-					owner.liftPiece(pos);
-					owner.placePiece(target, roll);
-					return true;
-				} else {
-					return false;
-				}
-			}
-		}
-		return false;
-
 	},
 	wouldBearOff: function(target){
 		return (target <= 0 || target > 24);
