@@ -133,8 +133,13 @@ loadIO = function(server){
 }
 
 canMove = function(){
-	var dice = _.pluck(currentDice, 'val');
-	var moveable = _.map(dice, function(d){return currentGame[currentPlayer].canMoveWith(d)});
+	var dice = _.pluck(_.where(currentDice, {rolled:false}), 'val');
+	var moveable = _.map(
+		dice, 
+		function(d){
+			return currentGame[currentPlayer].canMoveWith(d);
+		}
+	);
 	return _.contains(moveable, true);
 }
 start = function(port, cb, seed){
@@ -160,6 +165,7 @@ module.exports.resetServer = function(seed){
 module.exports.stop = stop;
 module.exports.board = function(){return currentGame};
 module.exports.dice = function(){return currentDice};
+module.exports.setDice = function(d){currentDice = d;};
 module.exports.canMove = canMove;
 module.exports.player = currentPlayer;
 module.exports.io = function(){return io};

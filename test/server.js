@@ -112,6 +112,19 @@ describe('Game', function(){
 					done();
 				});
 			});
+		}),	
+		it.only("should be possible to skip a turn if no piece can be moved but only one dice is left", function(done){
+			this.timeout(5000);
+			var c = app_module.board();
+			c.redState = {1:15};
+			c.blackState = {7:15};
+			app_module.setDice([{val:3, rolled:true}, {val:6, rolled:false}])
+			app_module.canMove().should.be.false;
+			browser = loadPage(function(){
+				$('#playable a').length.should.equal(1);
+				$('#playable').text().should.equal('Cannot move - skip turn');
+				done();
+			});
 		}),
 		it('should be possible to watch a full move complete and have the UI update the the next player', function(done){
 			client = ioClient.connect(socketURL, options);
