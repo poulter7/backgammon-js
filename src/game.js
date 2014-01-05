@@ -65,7 +65,11 @@ Player.prototype = {
 		} else if (pos == 'home') {
 			return false;
 		} else {
-			return this.board.bar[this.color] == 0;
+			if (this.bar > 0){
+				return false;
+			} else {
+				return this.board.bar[this.color] == 0;
+			}
 		}
 	},
 	canMoveWith: function(roll){
@@ -148,10 +152,14 @@ Player.prototype = {
 		)
 	},
 	targetPosition: function(pos, roll){
+		var p = pos;
+		if (pos == 'bar'){
+			p = this.color == 'red' ? 0: 25;
+		}
 		if (this.color == 'red'){
-			return pos + roll;
+			return p + roll;
 		} else if (this.color == 'black'){
-			return pos - roll;
+			return p - roll;
 		}
 	},
 	popBar: function(roll) {

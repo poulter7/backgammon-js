@@ -92,8 +92,15 @@ describe('Board', function(){
 			board.bar = {red:0 , black: 0};
 			board.red.canMoveWith(3).should.be.true;
 			board.black.canMoveWith(3).should.be.false;
+		}),
+		it('should be able to move if stack blocking from bar', function(){
+			var board = new Board();
+			board.blackState = {4:2};
+			board.redState = {10:2};
+			board.bar = {red:1, black: 0};
+			board.red.canMoveWith(4).should.be.false;
 		})
-	})
+	}),
 	describe('#player', function(){
 		it('should be possible from a player string to retreive the opponent', function(){
 			'red'.opponent().should.equal('black');

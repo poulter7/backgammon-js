@@ -113,7 +113,7 @@ describe('Game', function(){
 				});
 			});
 		}),	
-		it.only("should be possible to skip a turn if no piece can be moved but only one dice is left", function(done){
+		it("should be possible to skip a turn if no piece can be moved but only one dice is left", function(done){
 			this.timeout(5000);
 			var c = app_module.board();
 			c.redState = {1:15};
