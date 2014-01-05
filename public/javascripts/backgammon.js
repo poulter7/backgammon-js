@@ -118,25 +118,25 @@ selectPiece = function(circle){
 }
 
 render_dice = function(dice){
-	console.log('Render dice')
+	console.debug('Render dice')
 	d3.select("#dice")
 		.selectAll("a")
 		.remove();
 
-	console.log(dice)
+	console.debug(dice)
 	pieces = d3.select("#dice")
 		.selectAll("a")
 		.data(dice)
 		.enter()
 		.append("a")
 		.classed("used", function(d){ return d.rolled})
-		.on('click', function(d, i){console.log('Dice', d); selectDice(i)})
+		.on('click', function(d, i){console.debug('Dice', d); selectDice(i)})
 		.text(function(d){return d.val})
 }
 
 render_board = function(data){
 	deselect();
-	console.log('Rendering Board');
+	console.debug('Rendering Board');
 
 	// position -> count map
 	var perPositionCount = _.countBy(data, _.values);

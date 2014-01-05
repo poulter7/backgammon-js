@@ -8,7 +8,6 @@ currentPlayer = undefined
 rollDice = function(){
 	var x = chance.d6();
 	var y = chance.d6();
-	console.log('......', x, y)
 	if (x === y){
 		return [
 			{'val':x, 'rolled':false},
@@ -97,7 +96,6 @@ loadIO = function(server){
 			var currentPlayerPieceSelected = currentGame.owner(pos).color == currentPlayer;
 			if (!selectedDice.rolled && currentPlayerPieceSelected){
 				var roll = selectedDice.val;
-				console.log('Moving: ', pos, ' ', roll);
 				var success = currentGame.progressPiece(pos, roll);
 				if (success){
 					currentDice[rollIndex].rolled = true;
@@ -143,3 +141,5 @@ module.exports.resetServer = function(seed){
 	newGame(seed);
 }
 module.exports.stop = stop;
+module.exports.board = currentGame;
+module.exports.io = function(){return io};

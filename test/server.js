@@ -32,6 +32,7 @@ describe('Game', function(){
 	describe('#play', function(){
 		before(function(){
 			app_module.start(5000);
+			app_module.io().set('log level', 0);
 		}),
 		beforeEach(function(done){
 			this.timeout(5000)
@@ -146,6 +147,7 @@ describe('Game', function(){
 	describe('#view', function(){
 		before(function(done){
 			app_module.start(5000);
+			app_module.io().set('log level', 0);
 			done();
 		}),
 		beforeEach(function(){
@@ -212,7 +214,6 @@ describe('Game', function(){
 					client1.emit("move", 1, 2)
 				});
 			});
-
 		}),
 		it('should be Red to play first', function(done){
 			var client = ioClient.connect(socketURL, options);
@@ -249,7 +250,6 @@ describe('Game', function(){
 				client.emit("move", 24, 0);
 				client.on("status", function(board){
 					var pos = _.countBy(board, _.values);
-					console.log(pos)
 					pos.should.eql(
 						{
 							'1,red': 2,
@@ -274,7 +274,6 @@ describe('Game', function(){
 				client.once("status", function(data){
 					// check the update of the last move
 					var positionSummary = _.countBy(data, _.values);
-					console.log(positionSummary)
 					positionSummary['1,red'].should.equal(1);
 					positionSummary['7,red'].should.equal(1);
 
@@ -285,7 +284,6 @@ describe('Game', function(){
 
 					// check if the player changed
 					client.on("player", function(player){
-						console.log('player')
 						player.should.equal('black');
 						done();
 					});
@@ -307,8 +305,6 @@ describe('Game', function(){
 			var i = 0
 			doneAfter5 = _.after(5, done) 
 			diceCallback = function(dice){
-				console.log('Roll', i)
-				console.log(dice, i)
 				var targets = [
 					{0: {'val':6, 'rolled':true}, 1: {'val':6, 'rolled':false}, 2: {'val':6, 'rolled':false}, 3: {'val':6, 'rolled':false}},
 					{0: {'val':6, 'rolled':true}, 1: {'val':6, 'rolled':true}, 2: {'val':6, 'rolled':false}, 3: {'val':6, 'rolled':false}},
@@ -334,7 +330,6 @@ describe('Game', function(){
 			client.on("connect", function(){
 				client.emit("move", 19, 0);
 				client.on("dice", function(dice){
-					console.log(dice);
 					dice.should.eql([
 						{'val':6, 'rolled':false}, 
 						{'val':6, 'rolled':false}, 
@@ -345,16 +340,6 @@ describe('Game', function(){
 				})
 			})
 		}),
-		it.skip('should not make a move out of turn', function(done){
-			var client = ioClient.connect(socketURL, options);
-			client.on("connect", function(){
-				client.emit("move", 24, 0);
-				client.on("dice", function(dice){
-					console.log(dice);
-					done();
-				})
-			})
-		})
 		it.skip('should be possible to capture Black piece', function(done){
 			var client = ioClient.connect(socketURL, options);
 			display = function(data){console.log(data)}
@@ -365,7 +350,6 @@ describe('Game', function(){
 					client.once("status", function(data){
 						client.emit("move", 1, 6)
 						client.once("status", function(data){
-							console.log(data.length)
 							done();
 						})
 					})

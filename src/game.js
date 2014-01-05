@@ -28,6 +28,20 @@ function Player(color, board) {
 }
 
 Player.prototype = {
+	get ownedPositions(){
+		var t = this;
+		var positions = _.filter(
+			_.map(
+				_.keys(this.state), 
+				function(i){return parseInt(i)}
+			),
+			function(d, i){
+				return t.piecesAt(d) > 0;
+			}
+		);
+	    var barPositions = this.bar > 0 ? ['bar'] : [];
+		return positions.concat(barPositions);
+	},
 	get state() {
 		if (this.color == 'red'){
 			return this.board.redState;
@@ -54,6 +68,14 @@ Player.prototype = {
 			return this.board.bar[this.color] == 0;
 		}
 	},
+	canMoveWith: function(roll){
+		var t = this
+		var m = _.map(
+			this.ownedPositions, 
+			function(d){return t.validMove(d, roll)}
+		);
+		return _.contains(m, true)
+	},
 	canMoveToTarget: function(target){
 		return this.opponent.piecesAt(target) < 2;
 	},
@@ -75,8 +97,9 @@ Player.prototype = {
 		}
 		f = this.color == 'red' ? _.min : _.max;
 		furthestPip = f(homeValues);
+		requiredRollToHome = this.color == 'red' ? 25 - pos : pos
 
-		return nonHomeCount == 0 && this.bar == 0 && furthestPip == pos;
+		return nonHomeCount == 0 && this.bar == 0 && (furthestPip == pos || requiredRollToHome == roll);
 			
 	},
 	placePiece: function(target, roll){
