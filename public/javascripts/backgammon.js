@@ -8,7 +8,7 @@ var options ={
 };
 
 window.onload = function(){
-	client = io.connect(socketURL, options);
+	client = io.connect();//socketURL, options);
 	client.on("connect", function(data){
 		client.emit("status");
 		client.emit("dice");

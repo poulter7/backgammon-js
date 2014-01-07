@@ -6,8 +6,14 @@ _.any = function(ls){
 }
 
 function Board(redState, blackState, bar, home) {
-	this.blackState = typeof blackState !== 'undefined' ? blackState : {};
-	this.redState = typeof redState !== 'undefined' ? redState : {};
+	var bs = typeof blackState !== 'undefined' ? blackState : {};
+	var rs = typeof redState !== 'undefined' ? redState : {};
+	blankState = _.object(
+		_.range(1, 25), 
+		_.times(24,function(){return 0} )
+	)
+	this.blackState = _.extend({}, blankState, bs)
+	this.redState = _.extend({}, blankState, rs)
 	this.bar = typeof bar !== 'undefined' ? bar : {
 		black: 0,
 		red: 0
@@ -59,6 +65,15 @@ Player.prototype = {
 	get bar(){
 		return this.board.bar[this.color];
 	},
+	set bar(val){
+		this.board.bar[this.color] = val;
+	},
+	get home(){
+		return this.board.home[this.color];
+	},
+	set home(val){
+		this.board.home[this.color] = val;
+	},
 	canMovePieceAt: function(pos){
 		if (pos == 'bar'){
 			return true;
@@ -68,7 +83,7 @@ Player.prototype = {
 			if (this.bar > 0){
 				return false;
 			} else {
-				return this.board.bar[this.color] == 0;
+				return this.bar == 0;
 			}
 		}
 	},
@@ -108,29 +123,23 @@ Player.prototype = {
 	placePiece: function(target, roll){
 		if (this.board.wouldBearOff(target)){
 			// bearing off
-			this.board.home[this.color] += 1;
+			this.home += 1;
 		} else {
 			if (this.opponent.piecesAt(target) == 1){
 				this.opponent.state[target] = 0;
-				this.board.bar[this.opponent.color] += 1;
+				this.opponent.bar += 1;
 			}
 			this.state[target] = this.piecesAt(target) + 1;
 		}
 	},
 	liftPiece: function(pos){
 		if (pos === 'bar'){
-			this.board.bar[this.color] -= 1;
+			this.bar -= 1;
 		} else {
 			this.state[pos] -= 1; 
 		}
 	},
 	piecesAt: function(pos){
-		var r = {
-			red: this.board.red.state[pos],
-			black: this.board.black.state[pos],
-		}
-		assert( !this.board.red.state[pos]|| !this.board.black.state[pos], 'cannot have red and black pieces on the same point\n'.concat(this.toString()))
-
 		if (pos === 'bar'){
 			return this.bar
 		} else {
@@ -166,8 +175,8 @@ Player.prototype = {
 		}
 	},
 	progressPiece: function(pos, roll){
-		var target = this.targetPosition(pos, roll);
 		if (this.validMove(pos, roll)){
+			var target = this.targetPosition(pos, roll);
 			this.liftPiece(pos);
 			this.placePiece(target, roll);
 			return true;
