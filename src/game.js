@@ -195,17 +195,17 @@ Board.prototype = {
 		return new Player('black', this);
 	},
 	toString: function(){
-		return 'Red: ' + JSON.stringify(this.redState) + '\nBlack: ' + JSON.stringify(this.blackState);
+		return 'Red: ' + JSON.stringify(this.red.state) + '\nBlack: ' + JSON.stringify(this.black.state);
 	},
 	state: function(){
-		var redBar = _(this.bar.red).times(function(){return {position: 'bar', color: 'red'}})
-		var blackBar = _(this.bar.black).times(function(){return {position: 'bar', color: 'black'}})
-		var redHome= _(this.home.red).times(function(){return {position: 'home', color: 'red'}})
-		var blackHome = _(this.home.black).times(function(){return {position: 'home', color: 'black'}})
+		var redBar = _(this.red.bar).times(function(){return {position: 'bar', color: 'red'}})
+		var blackBar = _(this.black.bar).times(function(){return {position: 'bar', color: 'black'}})
+		var redHome= _(this.red.home).times(function(){return {position: 'home', color: 'red'}})
+		var blackHome = _(this.black.home).times(function(){return {position: 'home', color: 'black'}})
 
 		var redPieces = _.flatten(
 				_.map(
-					this.redState, 
+					this.red.state, 
 					function(p, k){
 						return _(p).times(
 							function(){return {position:parseInt(k), color:'red'}}
@@ -215,7 +215,7 @@ Board.prototype = {
 
 		var blackPieces = _.flatten(
 				_.map(
-					this.blackState, 
+					this.black.state, 
 					function(p, k){
 						return _(p).times(
 							function(){return {position:parseInt(k), color:'black'}}
