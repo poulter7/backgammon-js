@@ -4,47 +4,75 @@
 <div id="game-board">
 	<span>
 
-	<svg width="710" height="500">
-	<g class="background">
-	<rect width="710" height="700" />
+	<svg width="760" height="600">
+	<g class="border">
+	<rect width="760" height="562" />
 	</g>
-	<g class="places">
-	<polyline points="5,0 25,200 45,0 " />
-	<polyline points="55,0 75,200 95,0" />
-	<polyline points="105,0 125,200 145,0" />
-	<polyline points="155,0 175,200 195,0" />
-	<polyline points="205,0 225,200 245,0" />
-	<polyline points="255,0 275,200 295,0" />
+	<g transform="translate(30, 30)">
+		<g class="background">
+			<rect width="710" height="500" />
+		</g>
+		<g class="places">
+			<polyline points="5,0 25,200 45,0 " />
+			<polyline points="55,0 75,200 95,0" />
+			<polyline points="105,0 125,200 145,0" />
+			<polyline points="155,0 175,200 195,0" />
+			<polyline points="205,0 225,200 245,0" />
+			<polyline points="255,0 275,200 295,0" />
 
-	<polyline points="355,0 375,200 395,0" />
-	<polyline points="405,0 425,200 445,0" />
-	<polyline points="455,0 475,200 495,0" />
-	<polyline points="505,0 525,200 545,0" />
-	<polyline points="555,0 575,200 595,0" />
-	<polyline points="605,0 625,200 645,0" />
+			<polyline points="355,0 375,200 395,0" />
+			<polyline points="405,0 425,200 445,0" />
+			<polyline points="455,0 475,200 495,0" />
+			<polyline points="505,0 525,200 545,0" />
+			<polyline points="555,0 575,200 595,0" />
+			<polyline points="605,0 625,200 645,0" />
 
-	<polyline points="5,500 25,300    45,500" />
-	<polyline points="55,500 75,300   95,500" />
-	<polyline points="105,500 125,300 145,500" />
-	<polyline points="155,500 175,300 195,500" />
-	<polyline points="205,500 225,300 245,500" />
-	<polyline points="255,500 275,300 295,500" />
+			<polyline points="5,500 25,300    45,500" />
+			<polyline points="55,500 75,300   95,500" />
+			<polyline points="105,500 125,300 145,500" />
+			<polyline points="155,500 175,300 195,500" />
+			<polyline points="205,500 225,300 245,500" />
+			<polyline points="255,500 275,300 295,500" />
 
-	<polyline points="355,500 375,300 395,500" />
-	<polyline points="405,500 425,300 445,500" />
-	<polyline points="455,500 475,300 495,500" />
-	<polyline points="505,500 525,300 545,500" />
-	<polyline points="555,500 575,300 595,500" />
-	<polyline points="605,500 625,300 645,500" />
-	</g>
-	<g class="bar">
-	<rect x="300" width="50" height="500" />
-	</g>
-	<g class="home">
-	<rect x="660" width="50" height="500" />
-	</g>
+			<polyline points="355,500 375,300 395,500" />
+			<polyline points="405,500 425,300 445,500" />
+			<polyline points="455,500 475,300 495,500" />
+			<polyline points="505,500 525,300 545,500" />
+			<polyline points="555,500 575,300 595,500" />
+			<polyline points="605,500 625,300 645,500" />
+		</g>
+		<g class="bar">
+			<rect x="300" width="50" height="500" />
+		</g>
+		<g class="home">
+			<rect x="660" width="50" height="500" />
+		</g>
 
-	<g id="pieces">
+		<g id="pieces" ></g>
+		<text x="620" y="522" style="font-size:30" fill="white">1</text>
+		<text x="570" y="522" style="font-size:30" fill="white">2</text>
+		<text x="520" y="522" style="font-size:30" fill="white">3</text>
+		<text x="470" y="522" style="font-size:30" fill="white">4</text>
+		<text x="420" y="522" style="font-size:30" fill="white">5</text>
+		<text x="370" y="522" style="font-size:30" fill="white">6</text>
+		<text x="270" y="522" style="font-size:30" fill="white">7</text>
+		<text x="220" y="522" style="font-size:30" fill="white">8</text>
+		<text x="170" y="522" style="font-size:30" fill="white">9</text>
+		<text x="112" y="522" style="font-size:30" fill="white">10</text>
+		<text x="65" y="522" style="font-size:30" fill="white">11</text>
+		<text x="14" y="522" style="font-size:30" fill="white">12</text>
+		<text x="615" y="-7" style="font-size:30" fill="white">24</text>
+		<text x="565" y="-7" style="font-size:30" fill="white">23</text>
+		<text x="515" y="-7" style="font-size:30" fill="white">22</text>
+		<text x="465" y="-7" style="font-size:30" fill="white">21</text>
+		<text x="415" y="-7" style="font-size:30" fill="white">21</text>
+		<text x="365" y="-7" style="font-size:30" fill="white">19</text>
+		<text x="265" y="-7" style="font-size:30" fill="white">18</text>
+		<text x="215" y="-7" style="font-size:30" fill="white">17</text>
+		<text x="163" y="-7" style="font-size:30" fill="white">16</text>
+		<text x="115" y="-7" style="font-size:30" fill="white">15</text>
+		<text x="65" y="-7" style="font-size:30" fill="white">14</text>
+		<text x="15" y="-7" style="font-size:30" fill="white">13</text>
 	</g>
 	</svg>
 </span>

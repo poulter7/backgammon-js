@@ -203,25 +203,20 @@ Board.prototype = {
 		var redHome= _(this.red.home).times(function(){return {position: 'home', color: 'red'}})
 		var blackHome = _(this.black.home).times(function(){return {position: 'home', color: 'black'}})
 
-		var redPieces = _.flatten(
-				_.map(
-					this.red.state, 
-					function(p, k){
-						return _(p).times(
-							function(){return {position:parseInt(k), color:'red'}}
-						)
-					}
-				))
+		var pieceGenerator = function(color, count, position){
+			return _(count).times(
+				function(){return {position:parseInt(position), color:color}}
+			)
+		}
+		var redPieces = _.flatten(_.map(
+			this.red.state, 
+			_.partial(pieceGenerator, 'red')
+		))
 
-		var blackPieces = _.flatten(
-				_.map(
-					this.black.state, 
-					function(p, k){
-						return _(p).times(
-							function(){return {position:parseInt(k), color:'black'}}
-						)
-					}
-				))
+		var blackPieces = _.flatten(_.map(
+			this.black.state, 
+			_.partial(pieceGenerator, 'black')
+		))
 
 		return [].concat(redBar, blackBar, redHome, blackHome, redPieces, blackPieces)
 	},

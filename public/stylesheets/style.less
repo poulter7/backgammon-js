@@ -19,10 +19,12 @@ body {
 .background rect {
 	fill: @beize;
 }
-
 @col:#5C3F39;
 @col2: darken(@col, 20%);
 
+.border rect {
+	fill: darken(@board-border, 20%);
+}
 .places {
 
 	polyline:nth-child(even) {
@@ -55,6 +57,7 @@ body {
 }
 
 #pieces {
+	padding: 10px;
 	circle {
 		fill: lighten(black, 45%);
 		stroke: black;
@@ -91,6 +94,10 @@ body {
 		color: yellow;
 		cursor: pointer;
 	}
+}
+text {
+	display:inline-block; 
+	vertical-align:middle;
 }
 span #chat{
 	display: inline-block;
