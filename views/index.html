@@ -2,9 +2,9 @@
 <h2>Feel free to stay a while and play a game</h2>
 <div ><span id="player"></span> to play next</div>
 <div id="game-board">
-	<span>
+<span>
 
-	<svg width="760" height="600">
+	<svg width="760" height="562">
 	<g class="border">
 	<rect width="760" height="562" />
 	</g>
@@ -79,18 +79,25 @@
 <span id='chat'>
 	<div id='chat'>
 	Write a message: 
-	<div><input id=input placeholder=you-chat-here /></div>
-	<div id=box></div>
-	<script src=http://cdn.pubnub.com/pubnub.min.js></script>
+	<div>
+		<input id="input" placeholder="you-chat-here" />
+		<input type='color' id='color' value='#FF0000'/>
+	</div>
+	<div id="box"></div>
+	<script src="http://cdn.pubnub.com/pubnub.min.js"></script>
 	<script>(function(){
-		var box = PUBNUB.$('box'), input = PUBNUB.$('input'), channel = 'chat';
+		var box = PUBNUB.$('box');
+		var input = PUBNUB.$('input');
+		var color = PUBNUB.$('color');
+		var channel = 'backgammon-js.herokuapp.com';
 		PUBNUB.subscribe({
 			channel : channel,
-			callback : function(text) { box.innerHTML = (''+text).replace( /[<>]/g, '' ) + '<br>' + box.innerHTML }
+			callback : function(text, color) { 
+				box.innerHTML = '<font color="'+text[1]+'">' + (''+text[0]).replace( /[<>]/g, '' ) + '</font><br>' + box.innerHTML }
 		});
 		PUBNUB.bind( 'keyup', input, function(e) {
 			(e.keyCode || e.charCode) === 13 && PUBNUB.publish({
-				channel : channel, message : input.value, x : (input.value='')
+				channel : channel, message : [input.value, color.value], c : color.value, x : (input.value='')
 			})
 		} )
 	})()</script>
@@ -107,3 +114,4 @@
 <script src='javascripts/underscore.js'></script>
 <script src='javascripts/backgammon.js'></script>
 <script src="/socket.io/socket.io.js"></script>
+<script src="javascripts/spectrum.js"></script>	
