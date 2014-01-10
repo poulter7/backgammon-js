@@ -85,49 +85,57 @@ launchApp = function(app, port){
 switchControl = function(){
 	currentPlayer = currentPlayer.opponent();
 	currentDice = rollDice();
-	io.sockets.emit("player", currentPlayer);
+	announcePlayer();
 }
+announceDice = function(){
+	return io.sockets.emit("dice", {dice:currentDice, playable:canMove()});
+}
+announcePlayer = function(){
+	return io.sockets.emit("player", currentPlayer)
+}
+announcePlayable = function(){
+	return io.sockets.emit("playable", canMove())
+}
+announceState = function(){
+	return io.sockets.emit("status", currentGame.state())
+}
+performPass = function(){
+	switchControl();
+	announcePlayer();
+	announceState();
+	announceDice();
+
+}
+performMove = function(pos, rollIndex){
+	var selectedDice = currentDice[rollIndex];
+	var currentPlayerPieceSelected = currentGame.owner(pos).color == currentPlayer;
+	if (!selectedDice.rolled && currentPlayerPieceSelected){
+		var roll = selectedDice.val;
+		var success = currentGame[currentPlayer].progressPiece(pos, roll);
+		if (success){
+			currentDice[rollIndex].rolled = true;
+		}
+		var incomplete = _.contains(
+			_.pluck(currentDice, 'rolled'),
+			false
+		);
+		if (!incomplete){
+			switchControl();
+		}
+	}
+	announceState();
+	return announceDice();
+}
+
 loadIO = function(server){
 	var io = require('socket.io').listen(server);
-	var s = this;
 	io.sockets.on('connection', function (socket) {
-		socket.on("pass", function(){
-			switchControl();
-			io.sockets.emit("status", currentGame.state())
-			return io.sockets.emit("dice", {dice:currentDice, playable:s.canMove()});
-		})
-		socket.on("status", function() {
-			return socket.emit("status", currentGame.state())
-		});
-		socket.on("player", function() {
-			return socket.emit("player", currentPlayer)
-		});
-		socket.on("playable", function(){
-			return socket.emit("playable", s.canMove());
-		})
-		socket.on("move", function(pos, rollIndex) {
-			var selectedDice = currentDice[rollIndex];
-			var currentPlayerPieceSelected = currentGame.owner(pos).color == currentPlayer;
-			if (!selectedDice.rolled && currentPlayerPieceSelected){
-				var roll = selectedDice.val;
-				var success = currentGame[currentPlayer].progressPiece(pos, roll);
-				if (success){
-					currentDice[rollIndex].rolled = true;
-				}
-				var incomplete = _.contains(
-					_.pluck(currentDice, 'rolled'),
-					false
-				);
-				if (!incomplete){
-					switchControl();
-				}
-			}
-			io.sockets.emit("status", currentGame.state())
-			return io.sockets.emit("dice", {dice:currentDice, playable:s.canMove()});
-		});
-		socket.on("dice", function(){
-			return socket.emit("dice", {dice:currentDice, playable:s.canMove()});
-		});
+		socket.on("pass", performPass);
+		socket.on("status", announceState);
+		socket.on("player", announcePlayer);
+		socket.on("playable", announcePlayable);
+		socket.on("move", performMove);
+		socket.on("dice", announceDice);
 	});
 	return io;
 }

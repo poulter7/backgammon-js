@@ -2,6 +2,13 @@
 <h2>Feel free to stay a while and play a game</h2>
 <div ><span id="player"></span> to play next</div>
 <div id="game-board">
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src='javascripts/d3.js'></script>
+<script src='javascripts/jquery.js'></script>
+<script src='javascripts/underscore.js'></script>
+<script src='javascripts/backgammon.js'></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="javascripts/spectrum.js"></script>	
 <span>
 
 	<svg width="760" height="562">
@@ -65,7 +72,7 @@
 		<text x="565" y="-7" style="font-size:30" fill="white">23</text>
 		<text x="515" y="-7" style="font-size:30" fill="white">22</text>
 		<text x="465" y="-7" style="font-size:30" fill="white">21</text>
-		<text x="415" y="-7" style="font-size:30" fill="white">21</text>
+		<text x="415" y="-7" style="font-size:30" fill="white">20</text>
 		<text x="365" y="-7" style="font-size:30" fill="white">19</text>
 		<text x="265" y="-7" style="font-size:30" fill="white">18</text>
 		<text x="215" y="-7" style="font-size:30" fill="white">17</text>
@@ -76,6 +83,7 @@
 	</g>
 	</svg>
 </span>
+<!--
 <span id='chat'>
 	<div id='chat'>
 	Write a message: 
@@ -103,15 +111,9 @@
 	})()</script>
 </div>
 </span>
+-->
 </div>
 <div id="dice">
 </div>
 <div id="playable"></div>
 
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src='javascripts/d3.js'></script>
-<script src='javascripts/jquery.js'></script>
-<script src='javascripts/underscore.js'></script>
-<script src='javascripts/backgammon.js'></script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="javascripts/spectrum.js"></script>	
