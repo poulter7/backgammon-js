@@ -14,6 +14,19 @@ var options = {
 	'force new connection': true
 };
 
+Browser.prototype.keydown = function(targetSelector, keyCode) {
+  keyCode = keyCode.charCodeAt(0)
+  var event = this.window.document.createEvent('HTMLEvents');
+  event.initEvent('keydown', true, true);
+  event.which = keyCode;
+  if (targetSelector === this.window){
+	  var target = this.window
+  } else{
+	  var target = this.window.document.querySelector(targetSelector);
+  }
+  target && target.dispatchEvent(event);
+};
+
 waitFor = function(browser, precondition, callback){
 	var condition = precondition(browser);
 	if (precondition(browser)){
@@ -29,6 +42,7 @@ waitFor = function(browser, precondition, callback){
 }
 loadPage = function(cb){
 	var browser = new Browser();
+	browser.debug = true;
 	browser.visit("http://0.0.0.0:5000")
 	waitFor(
 		browser, 
@@ -46,6 +60,12 @@ loadPage = function(cb){
 					e.dispatchEvent(evt);
 				});
 			};
+			$.fn.pieceAt = function(pos, index){
+				return $('circle[pos="'+pos+'"][index="'+index+'"]').first()	
+			};
+			$.fn.diceAt = function(pos){
+				return $('#dice a').eq(pos)
+			}
 			if (cb){
 				cb();
 			}
@@ -54,6 +74,39 @@ loadPage = function(cb){
 	return browser
 }
 describe('Game', function(){
+	describe('#diceselect', function(){
+		before(function(){
+			app_module.start(5000);
+			app_module.io().set('log level', 0);
+		}),
+		beforeEach(function(done){
+			this.timeout(5000);
+			app_module.resetServer(seed=5);
+			// setup the browser and jQuery
+			browser = loadPage(done);
+		}),
+		after(function(done){
+			app_module.stop(done);
+		}),
+		it("should be possible to trigger a roll with a key press", function(done){
+			$('body').pieceAt(1, 1).d3Click()
+			browser.keydown(browser.window, '2');
+
+			firstDiceSelected = function(){
+				return $('body').diceAt(0).hasClass('used')
+			}
+			firstDiceSelected().should.be.false;
+			waitFor(browser, firstDiceSelected, function(){done()});
+		}),
+		it("should be possible to trigger a roll with a key press, for none dupe dice", function(done){
+			$('body').pieceAt(1, 1).d3Click()
+			browser.keydown(browser.window, '1');
+			secondDiceSelected = function(){
+				return $('body').diceAt(1).hasClass('used')
+			}
+			waitFor(browser, secondDiceSelected, function(){done()});
+		})
+	}),
 	describe('#play', function(){
 		before(function(){
 			app_module.start(5000);
@@ -181,6 +234,25 @@ describe('Game', function(){
 					done()
 				}
 			);
+		}),
+		it("should be possible to trigger a roll with a key press, for dupe dice", function(done){
+			this.timeout(5000);
+			$('body').pieceAt(1, 1).d3Click()
+			diceStr = '#dice a';
+			browser.keydown(browser.window, '6');
+
+			firstDiceSelected = function(){
+				return $('body').diceAt(0).hasClass('used')
+			}
+			secondDiceSelected = function(){
+				return $('body').diceAt(1).hasClass('used')
+			}
+			firstDiceSelected().should.be.false;
+			waitFor(browser, firstDiceSelected, function(){
+				$('body').pieceAt(1, 0).d3Click()
+				browser.keydown(browser.window, '6');
+				waitFor(browser, secondDiceSelected, function(){done()})
+			});
 		})
 	}),
 	describe('#view', function(){

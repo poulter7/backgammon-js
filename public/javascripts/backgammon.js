@@ -7,7 +7,7 @@ var options ={
 	'force new connection': true
 };
 
-window.onload = function(){
+$(window).load(function(){
 	client = io.connect();//socketURL, options);
 	client.on("connect", function(data){
 		client.emit("status");
@@ -21,9 +21,35 @@ window.onload = function(){
 		render_board(board);
 	});
 	client.on("dice", function(move_status){
-		render_dice(move_status.dice);
+		dice = move_status.dice
+		render_dice(dice);
 		render_skip_message(move_status.playable);
 	});
+})
+$(window).keydown(function(event){
+	keyCode = event.which || event.keyCode
+	if (keyCode >= 49 && keyCode <= 56){ // number pressed
+		diceNumber = String.fromCharCode(keyCode);
+		selectDiceValue(diceNumber);
+		event.preventDefault();
+	}
+
+})
+validDiceIndex = function(val){
+	for (var i in dice){
+		var d = dice[i];
+		if (d.val == val && !d.rolled){
+			return i
+		}
+	}
+}
+selectDiceValue = function(val){
+	console.log(dice)
+	var index = validDiceIndex(val);
+	console.log(index)
+	if (!(index === undefined)){
+		selectDice(index);	
+	}
 }
 
 px = {
