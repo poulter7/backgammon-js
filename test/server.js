@@ -74,6 +74,36 @@ loadPage = function(cb){
 	return browser
 }
 describe('Game', function(){
+	describe('#spacedicetrigger', function(){
+		before(function(){
+			app_module.start(5000);
+			app_module.io().set('log level', 0);
+		}),
+		beforeEach(function(done){
+			this.timeout(5000);
+			app_module.resetServer(seed=4, autodiceroll=false);
+			// setup the browser and jQuery
+			browser = loadPage(done);
+		}),
+		after(function(done){
+			app_module.stop(done);
+		}),
+		it.skip("Should be possible to force a player to roll the dice, clicking a link", function(done){
+
+		}),
+		it.skip("Should be possible to force a player to roll the dice, using spacebar", function(done){
+
+		}),
+		it.skip("Shouldn't be able to roll when there's still something to play", function(done){
+
+		}),
+		it.skip("Should be able to see a notification that a roll is neccessary", function(done){
+
+		})
+		it.skip("Shouldn't display a notification for rolling when a roll isn't neccessary", function(done){
+
+		})
+	}
 	describe('#diceselect', function(){
 		before(function(){
 			app_module.start(5000);

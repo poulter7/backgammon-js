@@ -166,9 +166,10 @@ stop = function(cb){
 	cb()
 }
 module.exports.start = start;
-module.exports.resetServer = function(seed){
+module.exports.resetServer = function(seed, autodiceroll){
 	dropAllClients();
 	newGame(seed);
+	autodiceroll = autodiceroll
 }
 module.exports.stop = stop;
 module.exports.board = function(){return currentGame};
