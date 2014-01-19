@@ -83,37 +83,8 @@
 	</g>
 	</svg>
 </span>
-<!--
-<span id='chat'>
-	<div id='chat'>
-	Write a message: 
-	<div>
-		<input id="input" placeholder="you-chat-here" />
-		<input type='color' id='color' value='#FF0000'/>
-	</div>
-	<div id="box"></div>
-	<script src="http://cdn.pubnub.com/pubnub.min.js"></script>
-	<script>(function(){
-		var box = PUBNUB.$('box');
-		var input = PUBNUB.$('input');
-		var color = PUBNUB.$('color');
-		var channel = 'backgammon-js.herokuapp.com';
-		PUBNUB.subscribe({
-			channel : channel,
-			callback : function(text, color) { 
-				box.innerHTML = '<font color="'+text[1]+'">' + (''+text[0]).replace( /[<>]/g, '' ) + '</font><br>' + box.innerHTML }
-		});
-		PUBNUB.bind( 'keyup', input, function(e) {
-			(e.keyCode || e.charCode) === 13 && PUBNUB.publish({
-				channel : channel, message : [input.value, color.value], c : color.value, x : (input.value='')
-			})
-		} )
-	})()</script>
-</div>
-</span>
--->
-</div>
 <div id="dice">
+</div>
 </div>
 <div id="playable"></div>
 
