@@ -99,11 +99,11 @@ describe('Game', function(){
 		}),
 		it.skip("Should be able to see a notification that a roll is neccessary", function(done){
 
-		})
+		}),
 		it.skip("Shouldn't display a notification for rolling when a roll isn't neccessary", function(done){
 
 		})
-	}
+	}),
 	describe('#diceselect', function(){
 		before(function(){
 			app_module.start(5000);
