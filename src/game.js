@@ -80,11 +80,7 @@ Player.prototype = {
 		} else if (pos == 'home') {
 			return false;
 		} else {
-			if (this.bar > 0){
-				return false;
-			} else {
-				return this.bar == 0;
-			}
+			return this.bar == 0;
 		}
 	},
 	canMoveWith: function(roll){
