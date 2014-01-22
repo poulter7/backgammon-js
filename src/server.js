@@ -2,9 +2,10 @@ var game = require('./game.js')
 var Chance = require('chance');
 var _ = require('underscore');
 
-currentGame = undefined
-currentPlayer = undefined
-currentDice = undefined
+currentGame = undefined;
+currentPlayer = undefined;
+currentDice = undefined;
+autoDiceRoll = false;
 
 rollDice = function(){
 	var x = chance.d6();
@@ -23,16 +24,21 @@ rollDice = function(){
 		]
 	}
 }
-
-newGame = function(seed){
-	if (seed){
-		chance = new Chance(seed);
-	} else {
-		chance = new Chance();
+resetDice = function(seed, performAutoDiceRoll){
+	chance = new Chance(seed);
+	currentDice = undefined;
+	autoDiceRoll = typeof performAutoDiceRoll != 'undefined'? performAutoDiceRoll : true;
+	if (autoDiceRoll){
+		currentDice = rollDice(); 
 	}
+}
+resetGame = function(){
 	currentGame = game.initialBoard();
 	currentPlayer = 'red';
-	currentDice = rollDice(); 
+}
+newGame = function(seed, performAutoDiceRoll){
+	resetDice(seed, performAutoDiceRoll);
+	resetGame();
 }
 
 module.exports.newGame = newGame;
@@ -83,8 +89,14 @@ launchApp = function(app, port){
 }
 
 switchControl = function(){
+	console.log('switching')
 	currentPlayer = currentPlayer.opponent();
-	currentDice = rollDice();
+	console.log('roll again')
+	if (autoDiceRoll){
+		currentDice = rollDice();
+	} else {
+		currentDice = undefined;
+	}
 	announcePlayer();
 }
 announceDice = function(){
@@ -99,11 +111,24 @@ announcePlayable = function(){
 announceState = function(){
 	return io.sockets.emit("status", currentGame.state())
 }
-performPass = function(){
-	switchControl();
-	announcePlayer();
-	announceState();
+performRoll = function(){
+	console.log("performing roll")
+	if (typeof currentDice == 'undefined'){
+		currentDice = rollDice();
+	}
 	announceDice();
+}
+performPass = function(){
+	console.log('Can move', canMove())
+	if (!canMove()){
+		switchControl();
+		announcePlayer();
+		announceState();
+		announceDice();
+		return true;
+	} else {
+		return false;
+	}
 
 }
 performMove = function(pos, rollIndex){
@@ -136,24 +161,29 @@ loadIO = function(server){
 		socket.on("playable", announcePlayable);
 		socket.on("move", performMove);
 		socket.on("dice", announceDice);
+		socket.on("roll", performRoll);
 	});
 	return io;
 }
 
 canMove = function(){
-	var dice = _.pluck(_.where(currentDice, {rolled:false}), 'val');
-	var moveable = _.map(
-		dice, 
-		function(d){
-			return currentGame[currentPlayer].canMoveWith(d);
-		}
-	);
-	return _.contains(moveable, true);
+	if (currentDice){
+		var dice = _.pluck(_.where(currentDice, {rolled:false}), 'val');
+		var moveable = _.map(
+			dice, 
+			function(d){
+				return currentGame[currentPlayer].canMoveWith(d);
+			}
+		);
+		return _.contains(moveable, true);
+	} else {
+		return true
+	}
 }
-start = function(port, cb, seed){
+start = function(port, cb, seed, performAutoDiceRoll){
 	server = launchApp(loadApp(), port);
 	io = loadIO(server);
-	newGame(seed);
+	newGame(seed, performAutoDiceRoll);
 }
 
 dropAllClients = function(){
@@ -166,10 +196,9 @@ stop = function(cb){
 	cb()
 }
 module.exports.start = start;
-module.exports.resetServer = function(seed, autodiceroll){
+module.exports.resetServer = function(seed, performAutoDiceRoll){
 	dropAllClients();
-	newGame(seed);
-	autodiceroll = autodiceroll
+	newGame(seed, performAutoDiceRoll);
 }
 module.exports.stop = stop;
 module.exports.board = function(){return currentGame};
@@ -177,4 +206,5 @@ module.exports.dice = function(){return currentDice};
 module.exports.setDice = function(d){currentDice = d;};
 module.exports.canMove = canMove;
 module.exports.player = currentPlayer;
+module.exports.performPass = function(){return performPass()};
 module.exports.io = function(){return io};

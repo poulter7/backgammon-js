@@ -77,24 +77,32 @@ body {
 	}
 }
 
-#dice {
+a.dice {
+	color: black;
 	font-family: "Dice";
 	font-size: 60px;
-	margin: 10px;
-	a {
-		color: black;
+	margin: 2px;
+	&.used {
+		color: lighten(grey, 20%);
 	}
-	a.red {
-		color: red;
-	}
-	a.used {
-		color: grey;
-	}
-	a:hover {
+	&:hover {
 		color: yellow;
 		cursor: pointer;
 	}
 }
+#dice {
+	margin:8px;
+}
+#diceroll {
+	font-size: 20px;
+	color: white;
+}
+#playlink {
+	margin:8px;
+	font-size: 20px;
+	color: white;
+}
+
 text {
 	display:inline-block; 
 	vertical-align:middle;
@@ -109,21 +117,3 @@ div #chat{
 	width: 200px;
 	padding: 5px;
 }
-#chat {
-	//z-index: 10;
-	//position: absolute;
-	right: 0;
-	top: 0;
-	#box {
-		padding: 5px;
-		width: 200px;
-		height: 500px;
-		background: whitesmoke;
-		border-width: 1px;
-		border-style: solid;
-		border-color: #EEEEE2;
-		overflow: hidden;
-	}
-
-}
-

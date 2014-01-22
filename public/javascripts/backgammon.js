@@ -21,21 +21,25 @@ $(window).load(function(){
 		render_board(board);
 	});
 	client.on("dice", function(move_status){
-		dice = move_status.dice
-		render_dice(dice);
-		render_skip_message(move_status.playable);
+		dice = move_status.dice;
+		render_dice(move_status.dice);
+		render_skip_message(move_status.dice, move_status.playable);
 	});
 })
 $(window).keydown(function(event){
 	keyCode = event.which || event.keyCode
+	console.log(keyCode)
 	if (keyCode >= 49 && keyCode <= 56){ // number pressed
 		diceNumber = String.fromCharCode(keyCode);
 		selectDiceValue(diceNumber);
 		event.preventDefault();
+	} else if (keyCode === 32){
+		requestRoll();
 	}
 
 })
 validDiceIndex = function(val){
+	console.log('Val', val)
 	for (var i in dice){
 		var d = dice[i];
 		if (d.val == val && !d.rolled){
@@ -44,9 +48,7 @@ validDiceIndex = function(val){
 	}
 }
 selectDiceValue = function(val){
-	console.log(dice)
 	var index = validDiceIndex(val);
-	console.log(index)
 	if (!(index === undefined)){
 		selectDice(index);	
 	}
@@ -147,9 +149,10 @@ passTurn = function(){
 	console.debug('passing'); 
 	client.emit('pass');
 }
-render_skip_message = function(playable){
-	var playableDiv = $('div#playable');
+render_skip_message = function(dice, playable){
+	var playableDiv = $('#playable');
 	playableDiv.empty();
+
 	if (!playable){
 		var link = $('<a id="playlink" href="#">Cannot move - skip turn</a>');
 		link.click(passTurn);
@@ -158,20 +161,34 @@ render_skip_message = function(playable){
 
 }
 render_dice = function(dice){
-	console.debug('Render dice')
 	d3.select("#dice")
 		.selectAll("a")
 		.remove();
 
-	console.debug(dice)
-	pieces = d3.select("#dice")
-		.selectAll("a")
-		.data(dice)
-		.enter()
-		.append("a")
-		.classed("used", function(d){ return d.rolled})
-		.on('click', function(d, i){console.debug('Dice', d); selectDice(i)})
-		.text(function(d){return d.val})
+	var diceDiv = $("#dice");
+	diceDiv.empty();
+
+	if (typeof dice != 'undefined'){
+		console.debug('Render dice')
+
+		console.debug(dice)
+		pieces = d3.select("#dice")
+			.selectAll("a")
+			.data(dice)
+			.enter()
+			.append("a")
+			.classed("dice", function(d){return true})
+			.classed("used", function(d){ return d.rolled})
+			.on('click', function(d, i){console.debug('Dice', d); selectDice(i)})
+			.text(function(d){return d.val})
+	} else {
+		var link = $('<a id="diceroll" href="#">Perform roll</a>)');
+		link.click(requestRoll);
+		link.appendTo(diceDiv)
+	}
+}
+requestRoll = function(){
+	client.emit('roll')
 }
 
 render_board = function(data){

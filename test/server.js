@@ -40,16 +40,25 @@ waitFor = function(browser, precondition, callback){
 		100
 	);
 }
-loadPage = function(cb){
+loadPage = function(cb, skipWaitingDice){
 	var browser = new Browser();
 	browser.debug = true;
 	browser.visit("http://0.0.0.0:5000")
 	waitFor(
 		browser, 
 		function(b){
-			return  b.success &&
-					b.queryAll("circle").length > 0 && 
-					browser.queryAll("#dice a").length > 0
+			var piecesOK = false;
+			var diceOK = false;
+			var pageLoaded = b.success
+
+			if (pageLoaded){
+				piecesOK = (b.queryAll("circle")|| []).length > 0;
+				diceOK = (b.queryAll("#dice a") || []).length > 0;
+				if (skipWaitingDice){
+					diceOK = true;
+				}
+			}
+			return pageLoaded && diceOK && piecesOK
 		}, function(){
 			$ = jQuery(browser.window)
 			$.fn.d3Click = function () {
@@ -81,27 +90,56 @@ describe('Game', function(){
 		}),
 		beforeEach(function(done){
 			this.timeout(5000);
-			app_module.resetServer(seed=4, autodiceroll=false);
+			app_module.resetServer(seed=5, autodiceroll=false);
 			// setup the browser and jQuery
-			browser = loadPage(done);
+			browser = loadPage(done, skipWaitingDice=true);
 		}),
 		after(function(done){
 			app_module.stop(done);
 		}),
-		it.skip("Should be possible to force a player to roll the dice, clicking a link", function(done){
+		it("Should be possible to force a player to roll the dice, clicking a link", function(done){
+			$('#dice a').length.should.equal(1);
+			$('#dice a').text().should.equal("Perform roll");
+			$('#playable a').length.should.equal(0)
+			browser.clickLink("#diceroll");
+
+			// roll should have been performed
+			waitFor(
+				browser,
+				function(){
+					return $('#dice a').text() == '21'
+				},
+				function(){
+					client = ioClient.connect(socketURL, options);
+					client.emit("move", 1, 0);
+					client.emit("move", 1, 1);
+					waitFor(
+						browser,
+						function(){
+							return $('#dice a').text() == "Perform roll";
+						},
+						function(){done();}
+					)
+				}
+			)
+		}),
+		it("Cannot pass if you haven't rolled", function(){
+			app_module.performPass().should.equal.false
 
 		}),
-		it.skip("Should be possible to force a player to roll the dice, using spacebar", function(done){
+		it("Should be possible to force a player to roll the dice, using spacebar", function(done){
+			browser.keydown(browser.window, ' ');
+			waitFor(
+				browser,
+				function(){
+					return $('#dice a').text() == '21'
+				},
+				function(){done()}
+			)
 
 		}),
-		it.skip("Shouldn't be able to roll when there's still something to play", function(done){
-
-		}),
-		it.skip("Should be able to see a notification that a roll is neccessary", function(done){
-
-		}),
-		it.skip("Shouldn't display a notification for rolling when a roll isn't neccessary", function(done){
-
+		it("Should be able to see a notification that a roll is neccessary", function(){
+			$('#dice a').text().should.equal("Perform roll")
 		})
 	}),
 	describe('#diceselect', function(){
@@ -135,6 +173,9 @@ describe('Game', function(){
 				return $('body').diceAt(1).hasClass('used')
 			}
 			waitFor(browser, secondDiceSelected, function(){done()});
+		}),
+		it("Shouldn't display a notification for rolling when a roll isn't neccessary", function(){
+			$('#dice a').text().should.not.equal("Perform roll")
 		})
 	}),
 	describe('#play', function(){
@@ -194,6 +235,19 @@ describe('Game', function(){
 					$('#dice a').text().should.equal('42');
 					done();
 				});
+			});
+		}),	
+		it("should be possible to skip a turn if no - server direct", function(done){
+			this.timeout(5000);
+			var c = app_module.board();
+			c.redState = {1:15};
+			c.blackState = {7:15};
+			app_module.performPass().should.equal.true
+			browser = loadPage(function(){
+				$('#dice a').text().should.equal('42');
+				$('#playable').text().should.equal('')
+				app_module.performPass().should.equal.false;
+				done();
 			});
 		}),	
 		it("should be possible to skip a turn if no piece can be moved but only one dice is left", function(done){
