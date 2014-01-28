@@ -149,6 +149,10 @@ passTurn = function(){
 	console.debug('passing'); 
 	client.emit('pass');
 }
+doubleCube = function(){
+	console.debug('double')
+	client.emit('double')
+}
 render_skip_message = function(dice, playable){
 	var playableDiv = $('#playable');
 	playableDiv.empty();
@@ -189,6 +193,10 @@ render_dice = function(dice){
 }
 requestRoll = function(){
 	client.emit('roll')
+}
+render_doubling_cube = function(cube){
+	$("#double_cube").text(cube)
+	$("#double_cube").click(doubleCube)
 }
 
 render_board = function(data){

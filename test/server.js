@@ -83,20 +83,20 @@ loadPage = function(cb, skipWaitingDice){
 	return browser
 }
 describe('Game', function(){
+	before(function(){
+		app_module.start(5000);
+		app_module.io().set('log level', 0);
+	}),
+	beforeEach(function(done){
+		this.timeout(5000);
+		app_module.resetServer(seed=5, autodiceroll=false);
+		// setup the browser and jQuery
+		browser = loadPage(done, skipWaitingDice=true);
+	}),
+	after(function(done){
+		app_module.stop(done);
+	}),
 	describe('#spacedicetrigger', function(){
-		before(function(){
-			app_module.start(5000);
-			app_module.io().set('log level', 0);
-		}),
-		beforeEach(function(done){
-			this.timeout(5000);
-			app_module.resetServer(seed=5, autodiceroll=false);
-			// setup the browser and jQuery
-			browser = loadPage(done, skipWaitingDice=true);
-		}),
-		after(function(done){
-			app_module.stop(done);
-		}),
 		it("Should be possible to force a player to roll the dice, clicking a link", function(done){
 			$('#dice a').length.should.equal(1);
 			$('#dice a').text().should.equal("Perform roll");
@@ -125,7 +125,6 @@ describe('Game', function(){
 		}),
 		it("Cannot pass if you haven't rolled", function(){
 			app_module.performPass().should.equal.false
-
 		}),
 		it("Should be possible to force a player to roll the dice, using spacebar", function(done){
 			browser.keydown(browser.window, ' ');
@@ -142,6 +141,27 @@ describe('Game', function(){
 			$('#dice a').text().should.equal("Perform roll")
 		})
 	}),
+	describe.only('#doubling_cube', function(){
+		it("Should be possible to see a doubling cube", function(){
+			$("#doubling_cube").text().should.equal("1")
+		}),
+		it("Should be possible to click the double cube", function(done){
+			browser.clickLink("#doubling_cube");
+			loadPage(function(){
+				$("#doubling_cube").text().should.equal("2");
+				done();
+			})
+		}),
+		it("Should progress doubling cube", function(){
+			app_module.doublingCubeValue().should.equal(1)
+			app_module.doublingCubeOwner().should.not.be.ok
+			app_module.doubleCube();
+
+		})
+	})
+})
+describe('Autoprogressing Game', function(){
+
 	describe('#diceselect', function(){
 		before(function(){
 			app_module.start(5000);
@@ -571,6 +591,11 @@ describe('Game', function(){
 					})
 				})
 			})
+		})
+	})
+	describe("#win", function(){
+		it.skip('should be possible to identify a win when it occurs', function(done){
+
 		})
 	})
 })

@@ -5,8 +5,12 @@ var _ = require('underscore');
 currentGame = undefined;
 currentPlayer = undefined;
 currentDice = undefined;
+doublingCubeValue = 1;
+doublingCubeOwner = undefined;
 autoDiceRoll = false;
+doubleCube = function(){
 
+}
 rollDice = function(){
 	var x = chance.d6();
 	var y = chance.d6();
@@ -162,6 +166,7 @@ loadIO = function(server){
 		socket.on("move", performMove);
 		socket.on("dice", announceDice);
 		socket.on("roll", performRoll);
+		socket.on("double", doubleCube);
 	});
 	return io;
 }
@@ -208,3 +213,6 @@ module.exports.canMove = canMove;
 module.exports.player = currentPlayer;
 module.exports.performPass = function(){return performPass()};
 module.exports.io = function(){return io};
+module.exports.doubleCube = doubleCube
+module.exports.doublingCubeValue = function(){return doublingCubeValue;};
+module.exports.doublingCubeOwner = function(){return doublingCubeOwner;};
