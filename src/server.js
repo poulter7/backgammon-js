@@ -25,7 +25,12 @@ rollDice = function(){
 	}
 }
 resetDice = function(seed, performAutoDiceRoll){
-	chance = new Chance(seed);
+	console.log('Seed', seed	)
+	if (seed === parseInt(seed)){
+		chance = new Chance(seed);
+	} else {
+		chance = new Chance();
+	}
 	currentDice = undefined;
 	autoDiceRoll = typeof performAutoDiceRoll != 'undefined'? performAutoDiceRoll : true;
 	if (autoDiceRoll){
