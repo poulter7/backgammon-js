@@ -84,9 +84,9 @@ loadPage = function(cb, skipWaitingDice){
 }
 describe('Game', function(){
 	describe('#launchapp', function(){
-		it.only("Should be possible to restart and have a different intial dice", function(done){
+		it.skip("Should be possible to restart and have a different intial dice", function(done){
 			require('../app.js')
-			t = chance.seed !== parseInt(chance.seed)
+			t = chance.seed === parseInt(chance.seed)
 			t.should.equal.true;
 			app_module.stop(done);
 		})
