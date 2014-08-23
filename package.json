@@ -2,7 +2,7 @@
   "dependencies": {
     "underscore": "~1.5.2",
     "node-inspector": "~0.6.2",
-    "express": "*",
+    "express": "< 4.0",
     "mustache": "*",
     "express3-handlebars": "*",
     "less-middleware": "*",

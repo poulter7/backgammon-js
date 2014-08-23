@@ -59,10 +59,9 @@ loadApp = function(){
 	var app = express();
 	// all environments
 	app.configure(function () {
-		app.use(lessMiddleware({
-			src: __dirname + '/../public',
-			compress: true
-		}));
+		app.use(lessMiddleware(
+			 __dirname + '/../public'
+		));
 
 		app.use(express.static(__dirname + '/../public'));
 	});
