@@ -72,7 +72,7 @@ loadApp = function(){
 			res.render('index');
 	});
 
-    var logger = require('morgan')
+    var logger = require('morgan');
     var bodyParser = require('body-parser')
     var methodOverride = require('method-override');
     var errorHandler = require('errorhandler');
