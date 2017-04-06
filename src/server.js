@@ -58,7 +58,7 @@ var ioModule = require('socket.io')
 loadApp = function(){
 	var app = express();
 	// all environments
-    app.use(lessMiddleware(__dirname + '/../public');
+    app.use(lessMiddleware(__dirname + '/../public'));
     app.use(express.static(__dirname + '/../public'));
 
 	app.engine('html', exphbs({defaultLayout: 'main', extname: '.html'}));
