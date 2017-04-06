@@ -34,7 +34,7 @@ resetDice = function(seed, performAutoDiceRoll){
 	currentDice = undefined;
 	autoDiceRoll = typeof performAutoDiceRoll != 'undefined'? performAutoDiceRoll : true;
 	if (autoDiceRoll){
-		currentDice = rollDice(); 
+		currentDice = rollDice();
 	}
 }
 resetGame = function(){
@@ -58,14 +58,12 @@ var ioModule = require('socket.io')
 loadApp = function(){
 	var app = express();
 	// all environments
-	app.configure(function () {
-		app.use(lessMiddleware({
-			src: __dirname + '/../public',
-			compress: true
-		}));
+    app.use(lessMiddleware({
+        src: __dirname + '/../public',
+        compress: true
+    }));
 
-		app.use(express.static(__dirname + '/../public'));
-	});
+    app.use(express.static(__dirname + '/../public'));
 
 	app.engine('html', exphbs({defaultLayout: 'main', extname: '.html'}));
 	app.set('view engine', 'html');
@@ -74,16 +72,19 @@ loadApp = function(){
 			res.render('index');
 	});
 
-	app.use(express.favicon());
-	app.use(express.logger('dev'));
-	app.use(express.json());
-	app.use(express.urlencoded());
-	app.use(express.methodOverride());
-	app.use(app.router);
+    var logger = require('morgan')
+    var bodyParser = require('body-parser')
+    var methodOverride = require('method-override');
+    var errorHandler = require('errorhandler');
+	app.use(logger('dev'));
+	app.use(bodyParser.json());
+	app.use(bodyParser.urlencoded({extended: true}));
+	app.use(methodOverride());
+	//app.use(app.router);
 	app.use(express.static(path.join(__dirname, '../public')));
 	// development only
 	if ('development' == app.get('env')) {
-		app.use(express.errorHandler());
+		app.use(errorHandler());
 	}
 	return app
 }
@@ -175,7 +176,7 @@ canMove = function(){
 	if (currentDice){
 		var dice = _.pluck(_.where(currentDice, {rolled:false}), 'val');
 		var moveable = _.map(
-			dice, 
+			dice,
 			function(d){
 				return currentGame[currentPlayer].canMoveWith(d);
 			}
